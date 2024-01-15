@@ -1,31 +1,23 @@
 import React from 'react';
 import {Alert, Text, TouchableOpacity, View} from 'react-native';
 import {useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {BarCodeReadEvent, RNCamera} from 'react-native-camera';
 // import QRScanner from 'react-native-qrcode-scanner';
 import {useDispatch} from 'react-redux';
 
-import type {AppStackParamList} from '../../navigator';
 import {styles} from './styles';
 import {CustomButton} from '../../components';
 import {saveUserData} from '../../redux/actions';
 import {validateUrl} from '../../utils/functions';
 
-type WelcomeScreenProp = NativeStackNavigationProp<
-  AppStackParamList,
-  'WelcomeScreen'
->;
-
 const QRCodeScanner = () => {
-  const navigate = useNavigation<WelcomeScreenProp>().navigate;
-  const goBack = useNavigation<WelcomeScreenProp>().goBack;
+  const navigate = useNavigation().navigate;
+  const goBack = useNavigation().goBack;
   const dispatch = useDispatch();
   const {top, bottom, left, right} = useSafeAreaInsets();
 
-  const onScanSuccess = (e: BarCodeReadEvent) => {
+  const onScanSuccess = e => {
     const joiningLink = e.data.replace('meeting', 'preview');
     if (validateUrl(joiningLink)) {
       if (!joiningLink.includes('app.100ms.live/')) {

@@ -10,14 +10,12 @@ import {
   View,
 } from 'react-native';
 import {useFocusEffect, useNavigation} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import {useDispatch} from 'react-redux';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-import type {AppStackParamList} from '../../navigator';
 import {styles} from './styles';
 import {getMeetingUrl, validateUrl} from '../../utils/functions';
 import {COLORS} from '../../utils/theme';
@@ -30,18 +28,13 @@ import {
 import {saveUserData} from '../../redux/actions';
 import {Constants} from '../../utils/types';
 
-type QRCodeScreenProp = NativeStackNavigationProp<
-  AppStackParamList,
-  'QRCodeScreen'
->;
-
 const QRCode = () => {
-  const navigate = useNavigation<QRCodeScreenProp>().navigate;
+  const navigate = useNavigation().navigate;
   const {top, bottom, left, right} = useSafeAreaInsets();
   const dispatch = useDispatch();
 
-  const [joinDisabled, setJoinDisabled] = useState<boolean>(true);
-  const [joiningLink, setJoiningLink] = useState<string>(getMeetingUrl());
+  const [joinDisabled, setJoinDisabled] = useState(true);
+  const [joiningLink, setJoiningLink] = useState(getMeetingUrl());
   const [moreModalVisible, setMoreModalVisible] = useState(false);
 
   const onJoinPress = () => {
@@ -77,7 +70,7 @@ const QRCode = () => {
       }
     });
 
-    const updateUrl = ({url}: {url: string}) => {
+    const updateUrl = ({url}) => {
       if (url) {
         setJoiningLink(url);
       }
@@ -103,8 +96,7 @@ const QRCode = () => {
     <KeyboardAvoidingView
       enabled={Platform.OS === 'ios'}
       behavior="padding"
-      style={styles.container}
-    >
+      style={styles.container}>
       <ScrollView
         contentContainerStyle={[
           styles.contentContainerStyle,
@@ -116,8 +108,7 @@ const QRCode = () => {
           },
         ]}
         style={styles.container}
-        keyboardShouldPersistTaps="always"
-      >
+        keyboardShouldPersistTaps="always">
         <Image
           style={styles.image}
           resizeMode="stretch"
@@ -185,8 +176,7 @@ const QRCode = () => {
         animationOut={'slideOutDown'}
         modalVisible={moreModalVisible}
         viewStyle={{height: 700}}
-        setModalVisible={closeMoreModal}
-      >
+        setModalVisible={closeMoreModal}>
         <JoinSettingsModalContent />
       </DefaultModal>
     </KeyboardAvoidingView>

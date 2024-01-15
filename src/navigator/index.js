@@ -8,14 +8,7 @@ import {Meeting} from '../screens/MeetingScreen/index';
 import {QRCode} from '../screens/QRCode';
 import {QRCodeScanner} from '../screens/QRCodeScanner';
 
-export type AppStackParamList = {
-  WelcomeScreen: undefined;
-  MeetingScreen: {isHLSViewer: boolean};
-  QRCodeScreen: undefined;
-  QRCodeScannerScreen: undefined;
-};
-
-const AppStack = createNativeStackNavigator<AppStackParamList>();
+const AppStack = createNativeStackNavigator();
 const navigationOptions = {
   gestureEnabled: false,
   headerShown: false,

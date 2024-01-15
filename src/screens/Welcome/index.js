@@ -2,19 +2,13 @@ import {
   HMSAudioTrackSettings,
   HMSCameraFacing,
   HMSConfig,
-  HMSException,
   HMSIOSAudioMode,
   HMSLogAlarmManager,
   HMSLogger,
   HMSLogLevel,
   HMSLogSettings,
-  HMSPeer,
   HMSPeerUpdate,
-  HMSRoom,
-  HMSRoomUpdate,
   HMSSDK,
-  HMSSessionStore,
-  HMSTrack,
   HMSTrackSettings,
   HMSTrackSettingsInitState,
   HMSTrackSource,
@@ -40,7 +34,6 @@ import {getModel} from 'react-native-device-info';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Toast from 'react-native-simple-toast';
 import {useDispatch, useSelector} from 'react-redux';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import {CustomButton, CustomInput, PreviewModal} from '../../components';
 import {
@@ -58,53 +51,36 @@ import {
   updatePeerTrackNodes,
 } from '../../utils/functions';
 import {COLORS} from '../../utils/theme';
-import {Constants, ModalTypes, PeerTrackNode} from '../../utils/types';
+import {Constants, ModalTypes} from '../../utils/types';
 import {styles} from './styles';
-
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import type {AppStackParamList} from '../../navigator';
-import type {RootState} from '../../redux';
-type WelcomeScreenProp = NativeStackNavigationProp<
-  AppStackParamList,
-  'WelcomeScreen'
->;
 
 const Welcome = () => {
   // hooks
-  const {replace, navigate} = useNavigation<WelcomeScreenProp>();
-  const roomID = useSelector((state: RootState) => state.user.roomID);
-  const userName = useSelector((state: RootState) => state.user.userName);
-  const joinConfig = useSelector((state: RootState) => state.app.joinConfig);
+  const {replace, navigate} = useNavigation();
+  const roomID = useSelector(state => state.user.roomID);
+  const userName = useSelector(state => state.user.userName);
+  const joinConfig = useSelector(state => state.app.joinConfig);
   const {top, bottom, left, right} = useSafeAreaInsets();
   const dispatch = useDispatch();
 
   // useState hook
-  const [peerTrackNodes, setPeerTrackNodes] = useState<Array<PeerTrackNode>>(
-    [],
-  );
-  const hmsInstanceRef = useRef<HMSSDK | null>(null);
-  const [config, setConfig] = useState<HMSConfig>();
-  const [nameDisabled, setNameDisabled] = useState<boolean>(true);
-  const [peerName, setPeerName] = useState<string>(userName);
-  const [startButtonLoading, setStartButtonLoading] = useState<boolean>(false);
-  const [joinButtonLoading, setJoinButtonLoading] = useState<boolean>(false);
-  const [previewTracks, setPreviewTracks] = useState<HMSTrack[]>();
-  const [hmsRoom, setHmsRoom] = useState<HMSRoom>();
-  const [modalType, setModalType] = useState<ModalTypes>(ModalTypes.DEFAULT);
+  const [peerTrackNodes, setPeerTrackNodes] = useState([]);
+  const hmsInstanceRef = useRef(null);
+  const [config, setConfig] = useState();
+  const [nameDisabled, setNameDisabled] = useState(true);
+  const [peerName, setPeerName] = useState(userName);
+  const [startButtonLoading, setStartButtonLoading] = useState(false);
+  const [joinButtonLoading, setJoinButtonLoading] = useState(false);
+  const [previewTracks, setPreviewTracks] = useState();
+  const [hmsRoom, setHmsRoom] = useState();
+  const [modalType, setModalType] = useState(ModalTypes.DEFAULT);
   const isHLSViewerRef = React.useRef(false);
 
   // useRef hook
-  const peerTrackNodesRef = React.useRef<Array<PeerTrackNode>>(peerTrackNodes);
+  const peerTrackNodesRef = React.useRef(peerTrackNodes);
 
   // listeners
-  const onPreviewSuccess = (
-    hmsInstance: HMSSDK,
-    hmsConfig: HMSConfig,
-    data: {
-      room: HMSRoom;
-      previewTracks: HMSTrack[];
-    },
-  ) => {
+  const onPreviewSuccess = (hmsInstance, hmsConfig, data) => {
     setHmsRoom(data.room);
     setPreviewTracks(data?.previewTracks);
 
@@ -126,7 +102,7 @@ const Welcome = () => {
     }
   };
 
-  const handleJoin = (data: {room: HMSRoom}) => {
+  const handleJoin = data => {
     // Checking if User is joining as HLS-Viewer
     if (
       !isHLSViewerRef.current &&
@@ -168,11 +144,11 @@ const Welcome = () => {
     replace('MeetingScreen', {isHLSViewer: isHLSViewerRef.current});
   };
 
-  const onJoinSuccess = (data: {room: HMSRoom}) => {
+  const onJoinSuccess = data => {
     handleJoin(data);
   };
 
-  const onError = (data: HMSException) => {
+  const onError = data => {
     setJoinButtonLoading(false);
     if (data.code === 424) {
       onFailure(data.description);
@@ -186,10 +162,7 @@ const Welcome = () => {
     }
   };
 
-  const onRoomListener = (
-    hmsInstance: HMSSDK,
-    data: {room: HMSRoom; type: HMSRoomUpdate},
-  ) => {
+  const onRoomListener = (hmsInstance, data) => {
     if (isHLSViewerRef.current) {
       // remove hms event listeners, so that we can take user to meeting screen, rather than handling events here
       removeListeners(hmsInstance);
@@ -200,13 +173,7 @@ const Welcome = () => {
     }
   };
 
-  const onPeerListener = ({
-    peer,
-    type,
-  }: {
-    peer: HMSPeer;
-    type: HMSPeerUpdate;
-  }) => {
+  const onPeerListener = ({peer, type}) => {
     if (type === HMSPeerUpdate.PEER_JOINED) {
       return;
     }
@@ -254,15 +221,7 @@ const Welcome = () => {
     }
   };
 
-  const onTrackListener = ({
-    peer,
-    track,
-    type,
-  }: {
-    peer: HMSPeer;
-    track: HMSTrack;
-    type: HMSTrackUpdate;
-  }) => {
+  const onTrackListener = ({peer, track, type}) => {
     if (type === HMSTrackUpdate.TRACK_ADDED) {
       const nodesPresent = getPeerTrackNodes(
         peerTrackNodesRef?.current,
@@ -346,17 +305,13 @@ const Welcome = () => {
     }
   };
 
-  const onSessionStoreAvailableListener = ({
-    sessionStore,
-  }: {
-    sessionStore: HMSSessionStore;
-  }) => {
+  const onSessionStoreAvailableListener = ({sessionStore}) => {
     // Saving `sessionStore` reference in `redux`
     dispatch(saveUserData({hmsSessionStore: sessionStore}));
   };
 
   // functions
-  const removePeerTrackNodes = (peer: HMSPeer) => {
+  const removePeerTrackNodes = peer => {
     const newPeerTrackNodes = peerTrackNodesRef?.current?.filter(
       peerTrackNode => {
         if (peerTrackNode.peer.peerID === peer.peerID) {
@@ -369,7 +324,7 @@ const Welcome = () => {
     peerTrackNodesRef.current = newPeerTrackNodes;
   };
 
-  const changePeerNodes = (nodesPresent: PeerTrackNode[], peer: HMSPeer) => {
+  const changePeerNodes = (nodesPresent, peer) => {
     const updatedPeerTrackNodes = updatePeerNodes(nodesPresent, peer);
     const newPeerTrackNodes = replacePeerTrackNodes(
       peerTrackNodesRef?.current,
@@ -379,11 +334,7 @@ const Welcome = () => {
     setPeerTrackNodes(newPeerTrackNodes);
   };
 
-  const changePeerTrackNodes = (
-    nodesPresent: PeerTrackNode[],
-    peer: HMSPeer,
-    track: HMSTrack,
-  ) => {
+  const changePeerTrackNodes = (nodesPresent, peer, track) => {
     const updatedPeerTrackNodes = updatePeerTrackNodes(
       nodesPresent,
       peer,
@@ -404,10 +355,10 @@ const Welcome = () => {
    * @param initEndpoint [Optional] - This is only required by 100ms Team for internal QA testing. Client developers should not use `initEndpoint` argument
    */
   const onStartSuccess = async (
-    roomCode: string,
-    userId?: string,
-    tokenEndpoint?: string,
-    initEndpoint?: string,
+    roomCode,
+    userId,
+    tokenEndpoint,
+    initEndpoint,
   ) => {
     try {
       const hmsInstance = await getHmsInstance();
@@ -568,7 +519,7 @@ const Welcome = () => {
     });
   };
 
-  const getLogSettings = (): HMSLogSettings => {
+  const getLogSettings = () => {
     return new HMSLogSettings({
       level: HMSLogLevel.VERBOSE,
       isLogStorageEnabled: true,
@@ -581,7 +532,7 @@ const Welcome = () => {
    * const hmsInstance = await HMSSDK.build();
    * @returns
    */
-  const getHmsInstance = async (): Promise<HMSSDK> => {
+  const getHmsInstance = async () => {
     /**
      * Only required for advanced use-case features like iOS Screen/Audio Share, Android Software Echo Cancellation, etc
      * NOT required for any other features.
@@ -623,7 +574,7 @@ const Welcome = () => {
     return hmsInstance;
   };
 
-  const validateName = (value: string) => {
+  const validateName = value => {
     if (value?.length > 0) {
       return true;
     }
@@ -635,14 +586,14 @@ const Welcome = () => {
     callService(roomID, onStartSuccess, onFailure);
   };
 
-  const onFailure = (error: string) => {
+  const onFailure = error => {
     setStartButtonLoading(false);
     Alert.alert('Error', error || 'Something went wrong', [
       {text: 'OK', style: 'cancel', onPress: handlePreviewLeave},
     ]);
   };
 
-  const removeListeners = (hmsInstance?: HMSSDK | null) => {
+  const removeListeners = hmsInstance => {
     hmsInstance?.removeEventListener(HMSUpdateListenerActions.ON_PREVIEW);
     hmsInstance?.removeEventListener(HMSUpdateListenerActions.ON_JOIN);
     hmsInstance?.removeEventListener(HMSUpdateListenerActions.ON_ROOM_UPDATE);
@@ -719,8 +670,7 @@ const Welcome = () => {
     <KeyboardAvoidingView
       enabled={Platform.OS === 'ios'}
       behavior="padding"
-      style={styles.container}
-    >
+      style={styles.container}>
       <ScrollView
         contentContainerStyle={[
           styles.contentContainerStyle,
@@ -732,8 +682,7 @@ const Welcome = () => {
           },
         ]}
         style={styles.container}
-        keyboardShouldPersistTaps="always"
-      >
+        keyboardShouldPersistTaps="always">
         <Image
           style={styles.image}
           resizeMode="stretch"
