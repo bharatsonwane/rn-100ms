@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    // ... other compiler options
+    "allowJs": true
+    // ... other compiler options
+  }
+  // ... other configurations
+}
