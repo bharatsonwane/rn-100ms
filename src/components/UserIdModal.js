@@ -8,17 +8,7 @@ import {
 } from 'react-native';
 import {COLORS, FONTS} from '../utils/theme';
 
-export const UserIdModal = ({
-  cancel,
-  join,
-  userName,
-  screen,
-}: {
-  cancel: Function;
-  join: Function;
-  userName: any;
-  screen: 'Welcome' | 'Meeting';
-}) => {
+export const UserIdModal = ({cancel, join, userName, screen}) => {
   const [text, setText] = useState(userName || '');
   return (
     <View style={styles.container}>
@@ -42,8 +32,7 @@ export const UserIdModal = ({
               style={styles.buttonTextContainer}
               onPress={() => {
                 cancel();
-              }}
-            >
+              }}>
               <Text style={styles.joinButtonText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -52,8 +41,7 @@ export const UserIdModal = ({
                 if (text !== '') {
                   join(text);
                 }
-              }}
-            >
+              }}>
               <Text style={styles.joinButtonText}>
                 {screen === 'Welcome' ? 'Join' : 'Set'}
               </Text>

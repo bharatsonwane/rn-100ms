@@ -5,11 +5,9 @@ import {
   GestureHandlerRootView,
   PanGestureHandler,
   State,
-  HandlerStateChangeEvent,
-  PinchGestureHandlerEventPayload,
 } from 'react-native-gesture-handler';
 
-const ZoomableView = ({children}: {children?: React.ReactNode}) => {
+const ZoomableView = ({children}) => {
   const baseScale = useRef(new Animated.Value(1)).current;
   const pinchScale = useRef(new Animated.Value(1)).current;
   const scale = Animated.multiply(baseScale, pinchScale);
@@ -31,9 +29,7 @@ const ZoomableView = ({children}: {children?: React.ReactNode}) => {
     translateX.extractOffset();
   }, [translateX, translateY]);
 
-  const onPinchHandlerStateChange = (
-    event: HandlerStateChangeEvent<PinchGestureHandlerEventPayload>,
-  ) => {
+  const onPinchHandlerStateChange = event => {
     if (event.nativeEvent.oldState === State.ACTIVE) {
       lastScale *= event.nativeEvent.scale;
       baseScale.setValue(lastScale);
@@ -45,19 +41,18 @@ const ZoomableView = ({children}: {children?: React.ReactNode}) => {
     <GestureHandlerRootView style={styles.container}>
       <PanGestureHandler
         onGestureEvent={handlePan}
-        onHandlerStateChange={onHandlerStateChange}
-      >
+        onHandlerStateChange={onHandlerStateChange}>
         <Animated.View>
           <PinchGestureHandler
             onGestureEvent={handlePinch}
-            onHandlerStateChange={onPinchHandlerStateChange}
-          >
+            onHandlerStateChange={onPinchHandlerStateChange}>
             <Animated.View
               style={[
                 styles.zoomableView,
-                {transform: [{scale: scale}, {translateX}, {translateY}]},
-              ]}
-            >
+                {
+                  transform: [{scale: scale}, {translateX}, {translateY}],
+                },
+              ]}>
               {children}
             </Animated.View>
           </PinchGestureHandler>

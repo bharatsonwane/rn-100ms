@@ -11,8 +11,6 @@ import {
 } from 'react-native';
 import {
   HMSAudioFilePlayerNode,
-  HMSAudioMixingMode,
-  HMSLocalPeer,
   HMSUpdateListenerActions,
 } from '@100mslive/react-native-hms';
 import {useDispatch, useSelector} from 'react-redux';
@@ -25,7 +23,6 @@ import DocumentPicker from 'react-native-document-picker';
 import {openSettings, requestNotifications} from 'react-native-permissions';
 
 import {COLORS} from '../utils/theme';
-import type {RootState} from '../redux';
 import {
   changePipModeStatus,
   changeEnableHLSPlayerControls,
@@ -35,24 +32,7 @@ import {
 import {ModalTypes, PipModes} from '../utils/types';
 import {parseMetadata} from '../utils/functions';
 
-interface RoomSettingsModalContentProps {
-  localPeer?: HMSLocalPeer;
-  isHLSStreaming?: boolean;
-  rtmpAndRecording?: boolean;
-  newAudioMixingMode: HMSAudioMixingMode;
-  isAudioShared: boolean;
-  audioDeviceListenerAdded: boolean;
-  muteAllTracksAudio: boolean;
-  closeRoomSettingsModal(): void;
-  setModalVisible(modalType: ModalTypes, delay?: boolean): void;
-  setIsAudioShared(state: boolean): void;
-  setAudioDeviceListenerAdded(state: boolean): void;
-  setMuteAllTracksAudio(state: boolean): void;
-}
-
-export const RoomSettingsModalContent: React.FC<
-  RoomSettingsModalContentProps
-> = ({
+export const RoomSettingsModalContent = ({
   localPeer,
   isHLSStreaming,
   rtmpAndRecording,
@@ -73,21 +53,15 @@ export const RoomSettingsModalContent: React.FC<
 
   // REDUX STATES & DISPATCH
   const dispatch = useDispatch();
-  const hmsInstance = useSelector((state: RootState) => state.user.hmsInstance);
-  const pipModeStatus = useSelector(
-    (state: RootState) => state.app.pipModeStatus,
-  );
-  const audioMixer = useSelector(
-    (state: RootState) => state.app.joinConfig.audioMixer,
-  );
-  const showHLSStats = useSelector(
-    (state: RootState) => state.app.joinConfig.showHLSStats,
-  );
+  const hmsInstance = useSelector(state => state.user.hmsInstance);
+  const pipModeStatus = useSelector(state => state.app.pipModeStatus);
+  const audioMixer = useSelector(state => state.app.joinConfig.audioMixer);
+  const showHLSStats = useSelector(state => state.app.joinConfig.showHLSStats);
   const enableHLSPlayerControls = useSelector(
-    (state: RootState) => state.app.joinConfig.enableHLSPlayerControls,
+    state => state.app.joinConfig.enableHLSPlayerControls,
   );
   const showCustomHLSPlayerControls = useSelector(
-    (state: RootState) => state.app.joinConfig.showCustomHLSPlayerControls,
+    state => state.app.joinConfig.showCustomHLSPlayerControls,
   );
 
   // CONSTANTS
@@ -182,7 +156,7 @@ export const RoomSettingsModalContent: React.FC<
       } else {
         setAudioDeviceListenerAdded(true);
 
-        hmsInstance.setAudioDeviceChangeListener((data: any) => {
+        hmsInstance.setAudioDeviceChangeListener(data => {
           Toast.showWithGravity(
             `Audio Device Output changed to ${data?.device}`,
             Toast.LONG,
@@ -354,8 +328,7 @@ export const RoomSettingsModalContent: React.FC<
 
       <ScrollView
         style={styles.contentContainer}
-        contentContainerStyle={styles.scrollContentContainer}
-      >
+        contentContainerStyle={styles.scrollContentContainer}>
         <TouchableOpacity onPress={handleBRB} style={styles.button}>
           <Image
             source={require('../../assets/brb.png')}
@@ -598,19 +571,7 @@ export const RoomSettingsModalContent: React.FC<
   );
 };
 
-interface SettingItemProps {
-  onPress(): void;
-  text: string;
-  iconName: string;
-  IconType: any;
-}
-
-const SettingItem: React.FC<SettingItemProps> = ({
-  onPress,
-  text,
-  iconName,
-  IconType,
-}) => {
+const SettingItem = ({onPress, text, iconName, IconType}) => {
   return (
     <TouchableOpacity style={styles.button} onPress={onPress}>
       <IconType name={iconName} size={24} style={styles.icon} />

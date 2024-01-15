@@ -1,24 +1,6 @@
 import React from 'react';
 
-import {
-  Platform,
-  Pressable,
-  PressableProps,
-  StyleSheet,
-  Text,
-  TextStyle,
-  View,
-  ViewStyle,
-} from 'react-native';
-
-export type MenuItemProps = {
-  children: React.ReactNode;
-  disabled?: boolean;
-  disabledTextColor?: string;
-  pressColor?: string;
-  style?: ViewStyle;
-  textStyle?: TextStyle;
-} & PressableProps;
+import {Platform, Pressable, StyleSheet, Text, View} from 'react-native';
 
 export function MenuItem({
   children,
@@ -29,7 +11,7 @@ export function MenuItem({
   style,
   textStyle,
   ...props
-}: MenuItemProps) {
+}) {
   return (
     <Pressable
       disabled={disabled}
@@ -39,8 +21,7 @@ export function MenuItem({
       })}
       android_ripple={{color: pressColor}}
       onPress={onPress}
-      {...props}
-    >
+      {...props}>
       <View style={[styles.container, style]}>
         <Text
           numberOfLines={1}
@@ -48,8 +29,7 @@ export function MenuItem({
             styles.title,
             disabled && {color: disabledTextColor},
             textStyle,
-          ]}
-        >
+          ]}>
           {children}
         </Text>
       </View>

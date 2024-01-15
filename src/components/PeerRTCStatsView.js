@@ -1,35 +1,12 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import {
-  HMSLocalAudioStats,
-  HMSRemoteAudioStats,
-  HMSRemoteVideoStats,
-  HMSLocalVideoStats,
-  HMSQualityLimitationReasons,
-} from '@100mslive/react-native-hms';
 
 import {COLORS} from '../utils/theme';
 
-type TrackStats =
-  | HMSLocalAudioStats
-  | HMSRemoteAudioStats
-  | HMSRemoteVideoStats
-  | HMSLocalVideoStats[]
-  | null
-  | undefined;
-
-interface PeerRTCStatsViewProps {
-  audioTrackStats: TrackStats;
-  videoTrackStats: TrackStats;
-}
-
-const PeerRTCStatsView: React.FC<PeerRTCStatsViewProps> = ({
-  audioTrackStats,
-  videoTrackStats,
-}) => {
+const PeerRTCStatsView = ({audioTrackStats, videoTrackStats}) => {
   const qualityLimitationReasons =
     videoTrackStats && 'qualityLimitationReasons' in videoTrackStats
-      ? (videoTrackStats.qualityLimitationReasons as HMSQualityLimitationReasons)
+      ? videoTrackStats.qualityLimitationReasons
       : null;
 
   return (

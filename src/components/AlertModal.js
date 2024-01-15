@@ -16,14 +16,8 @@ export const AlertModal = ({
   title,
   buttons,
   screen,
-}: {
-  screen?: String;
-  modalVisible: boolean;
-  setModalVisible: any;
-  title: String;
-  buttons: Array<{text: String; type?: String; onPress?: Function}>;
 }) => {
-  const onRequestClose: any = () => {
+  const onRequestClose = () => {
     setModalVisible(!modalVisible);
   };
   return (
@@ -32,20 +26,17 @@ export const AlertModal = ({
       transparent={true}
       visible={modalVisible}
       supportedOrientations={['portrait', 'landscape']}
-      onRequestClose={onRequestClose}
-    >
+      onRequestClose={onRequestClose}>
       <View
         style={styles.centeredView}
         onTouchEnd={() => {
           onRequestClose();
-        }}
-      >
+        }}>
         <View
           style={styles.modalView}
           onTouchEnd={e => {
             e.stopPropagation();
-          }}
-        >
+          }}>
           <ScrollView showsVerticalScrollIndicator indicatorStyle="white">
             <Text style={styles.title}>{title}</Text>
             {buttons.map((button, index) => (
@@ -58,22 +49,19 @@ export const AlertModal = ({
                 style={[
                   styles.buttonItem,
                   index === buttons.length - 1 && styles.buttonItemLast,
-                ]}
-              >
+                ]}>
                 <Text
                   style={[
                     styles.buttonItemText,
                     button.type === 'cancel' && styles.cancel,
-                  ]}
-                >
+                  ]}>
                   {button.text}
                 </Text>
               </TouchableOpacity>
             ))}
             {screen !== undefined && screen === 'welcome' && (
               <Text
-                style={styles.title}
-              >{`App Version :    ${getVersion()}`}</Text>
+                style={styles.title}>{`App Version :    ${getVersion()}`}</Text>
             )}
           </ScrollView>
         </View>

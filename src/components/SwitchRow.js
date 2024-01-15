@@ -1,24 +1,9 @@
 import React from 'react';
-import {
-  Switch,
-  View,
-  Text,
-  StyleSheet,
-  StyleProp,
-  ViewStyle,
-} from 'react-native';
+import {Switch, View, Text, StyleSheet} from 'react-native';
 
 import {COLORS} from '../utils/theme';
 
-interface SwitchRow {
-  value: boolean;
-  onChange(value: boolean): void;
-  text: string;
-  containerStyle?: StyleProp<ViewStyle>;
-  LeftIcon?: React.ReactNode;
-}
-
-export const SwitchRow: React.FC<SwitchRow> = ({
+export const SwitchRow = ({
   text,
   LeftIcon,
   containerStyle,

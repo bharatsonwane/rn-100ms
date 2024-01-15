@@ -2,11 +2,7 @@ import React from 'react';
 
 import {StyleSheet, View} from 'react-native';
 
-export interface MenuDividerProps {
-  color?: string;
-}
-
-export function MenuDivider({color = 'rgba(0,0,0,0.12)'}: MenuDividerProps) {
+export function MenuDivider({color = 'rgba(0,0,0,0.12)'}) {
   return <View style={[styles.divider, {borderBottomColor: color}]} />;
 }
 

@@ -1,36 +1,19 @@
 import React, {useState, useEffect} from 'react';
 import {useSelector} from 'react-redux';
 import {View, TouchableOpacity, Text, StyleSheet, Platform} from 'react-native';
-import {
-  HMSRemoteVideoTrack,
-  HMSTrack,
-  HMSLayer,
-  HMSSimulcastLayerDefinition,
-} from '@100mslive/react-native-hms';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import {CustomButton} from './CustomButton';
-import type {RootState} from '../redux';
 import {COLORS} from '../utils/theme';
 import {Menu, MenuItem} from './MenuModal';
 
-interface PeerSettingsModalContentProps {
-  track: HMSTrack;
-  cancelModal(): void;
-}
-
-export const StreamingQualityModalContent: React.FC<
-  PeerSettingsModalContentProps
-> = ({track, cancelModal}) => {
-  const hmsInstance = useSelector((state: RootState) => state.user.hmsInstance);
-  const [remoteVideoTrack, setRemoteVideoTrack] =
-    useState<HMSRemoteVideoTrack | null>(null);
+export const StreamingQualityModalContent = ({track, cancelModal}) => {
+  const hmsInstance = useSelector(state => state.user.hmsInstance);
+  const [remoteVideoTrack, setRemoteVideoTrack] = useState(null);
   const [showQualityOptions, setShowQualityOptions] = useState(false);
-  const [originalLayer, setOriginalLayer] = useState<HMSLayer | null>(null);
-  const [selectedLayer, setSelectedLayer] = useState<HMSLayer | null>(null);
-  const [layerDefinitions, setLayerDefinitions] = useState<
-    HMSSimulcastLayerDefinition[]
-  >([]);
+  const [originalLayer, setOriginalLayer] = useState(null);
+  const [selectedLayer, setSelectedLayer] = useState(null);
+  const [layerDefinitions, setLayerDefinitions] = useState([]);
 
   useEffect(() => {
     if (remoteVideoTrack) {
@@ -100,8 +83,7 @@ export const StreamingQualityModalContent: React.FC<
           anchor={
             <TouchableOpacity
               style={styles.participantFilterContainer}
-              onPress={() => setShowQualityOptions(true)}
-            >
+              onPress={() => setShowQualityOptions(true)}>
               <Text style={styles.participantFilterText} numberOfLines={1}>
                 {selectedLayer}
               </Text>
@@ -113,8 +95,7 @@ export const StreamingQualityModalContent: React.FC<
             </TouchableOpacity>
           }
           onRequestClose={() => setShowQualityOptions(false)}
-          style={styles.participantsMenuContainer}
-        >
+          style={styles.participantsMenuContainer}>
           {layerDefinitions.map(layerDefinition => {
             const isSelected = layerDefinition.layer === selectedLayer;
 
@@ -127,8 +108,7 @@ export const StreamingQualityModalContent: React.FC<
                 key={layerDefinition.layer}
                 style={
                   isSelected ? styles.participantMenuActiveItem : undefined
-                }
-              >
+                }>
                 <View style={styles.participantMenuItem}>
                   <Text style={styles.participantFilterText}>
                     {layerDefinition.layer} {layerDefinition.resolution.width}x

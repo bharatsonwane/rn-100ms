@@ -8,14 +8,9 @@ import {
   Platform,
 } from 'react-native';
 import {
-  HMSLocalPeer,
   HMSMessage,
   HMSMessageRecipient,
   HMSMessageRecipientType,
-  HMSPeer,
-  HMSRemotePeer,
-  HMSRole,
-  HMSSDK,
 } from '@100mslive/react-native-hms';
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -26,12 +21,11 @@ import {useDispatch, useSelector} from 'react-redux';
 
 import {Menu, MenuDivider, MenuItem} from './MenuModal';
 import {COLORS} from '../utils/theme';
-import type {RootState} from '../redux';
 import {CustomInput} from './CustomInput';
 import {CustomButton} from './CustomButton';
-import {addMessage, addPinnedMessage} from '../redux/actions';
+import {addMessage} from '../redux/actions';
 
-const getTimeStringin12HourFormat = (time: Date) => {
+const getTimeStringin12HourFormat = time => {
   let hours = time.getHours();
   const minutes = time.getMinutes();
   const notation = hours / 12 > 1 ? ' PM' : ' AM';
@@ -45,27 +39,11 @@ const getTimeStringin12HourFormat = (time: Date) => {
 };
 
 const ChatFilter = memo(
-  ({
-    instance,
-    filter,
-    setFilter,
-    setType,
-    setReceiverObject,
-  }: {
-    instance?: HMSSDK;
-    filter?: string;
-    setFilter: React.Dispatch<React.SetStateAction<string>>;
-    setType: React.Dispatch<
-      React.SetStateAction<'everyone' | 'direct' | 'role'>
-    >;
-    setReceiverObject: React.Dispatch<
-      React.SetStateAction<'everyone' | HMSRole | HMSRemotePeer>
-    >;
-  }) => {
-    const roles = useSelector((state: RootState) => state.user.roles);
+  ({instance, filter, setFilter, setType, setReceiverObject}) => {
+    const roles = useSelector(state => state.user.roles);
 
-    const [visible, setVisible] = useState<boolean>(false);
-    const [remotePeers, setRemotePeers] = useState<HMSRemotePeer[]>();
+    const [visible, setVisible] = useState(false);
+    const [remotePeers, setRemotePeers] = useState();
 
     const hideMenu = () => setVisible(false);
     const showMenu = () => setVisible(true);
@@ -82,8 +60,7 @@ const ChatFilter = memo(
         anchor={
           <TouchableOpacity
             style={styles.chatFilterContainer}
-            onPress={showMenu}
-          >
+            onPress={showMenu}>
             <Text style={styles.chatFilterText} numberOfLines={1}>
               {filter}
             </Text>
@@ -95,16 +72,14 @@ const ChatFilter = memo(
           </TouchableOpacity>
         }
         onRequestClose={hideMenu}
-        style={styles.chatMenuContainer}
-      >
+        style={styles.chatMenuContainer}>
         <MenuItem
           onPress={() => {
             hideMenu();
             setType('everyone');
             setReceiverObject('everyone');
             setFilter('everyone');
-          }}
-        >
+          }}>
           <View style={styles.chatMenuItem}>
             <Ionicons
               name="people-outline"
@@ -122,10 +97,9 @@ const ChatFilter = memo(
                 hideMenu();
                 setType('role');
                 setReceiverObject(knownRole);
-                setFilter(knownRole?.name!);
+                setFilter(knownRole?.name);
               }}
-              key={knownRole.name}
-            >
+              key={knownRole.name}>
               <View style={styles.chatMenuItem}>
                 <Text style={styles.chatMenuItemName}>{knownRole?.name}</Text>
               </View>
@@ -142,8 +116,7 @@ const ChatFilter = memo(
                 setReceiverObject(remotePeer);
                 setFilter(remotePeer.name);
               }}
-              key={remotePeer.name}
-            >
+              key={remotePeer.name}>
               <View style={styles.chatMenuItem}>
                 <Ionicons
                   name="person-outline"
@@ -162,12 +135,8 @@ const ChatFilter = memo(
 
 ChatFilter.displayName = 'ChatFilter';
 
-const ChatList = ({
-  setSessionMetaData,
-}: {
-  setSessionMetaData: (value: string | null) => void;
-}) => {
-  const messages = useSelector((state: RootState) => state.messages.messages);
+const ChatList = ({setSessionMetaData}) => {
+  const messages = useSelector(state => state.messages.messages);
 
   // const scollviewRef = useRef<FlatList>(null);
 
@@ -186,7 +155,7 @@ const ChatList = ({
       maxToRenderPerBatch={3}
       windowSize={11}
       keyboardShouldPersistTaps="always"
-      renderItem={({item, index}: {item: HMSMessage; index: number}) => {
+      renderItem={({item, index}) => {
         const data = item;
         const isLocal = data.sender?.isLocal;
         return (
@@ -199,8 +168,7 @@ const ChatList = ({
                 styles.privateMessageBubble,
               isLocal && styles.sendMessageBubble,
             ]}
-            key={index}
-          >
+            key={index}>
             <View style={styles.headingContainer}>
               <View style={styles.headingLeftContainer}>
                 <Text style={styles.senderName}>
@@ -256,8 +224,7 @@ const ChatList = ({
             </View>
             <Text
               style={[styles.messageText, {color: 'gray'}]}
-              ellipsizeMode="middle"
-            >
+              ellipsizeMode="middle">
               {data.messageId}
             </Text>
             <Text style={styles.messageText}>{data.message}</Text>
@@ -269,28 +236,22 @@ const ChatList = ({
   );
 };
 
-export const ChatWindow = ({localPeer}: {localPeer?: HMSLocalPeer}) => {
+export const ChatWindow = ({localPeer}) => {
   // hooks
-  const hmsInstance = useSelector((state: RootState) => state.user.hmsInstance);
-  const hmsSessionStore = useSelector(
-    (state: RootState) => state.user.hmsSessionStore,
-  );
-  const pinnedMessage = useSelector(
-    (state: RootState) => state.messages.pinnedMessage,
-  );
+  const hmsInstance = useSelector(state => state.user.hmsInstance);
+  const hmsSessionStore = useSelector(state => state.user.hmsSessionStore);
+  const pinnedMessage = useSelector(state => state.messages.pinnedMessage);
   const dispatch = useDispatch();
   const {bottom} = useSafeAreaInsets();
 
   // useState hook
-  const [filter, setFilter] = useState<string>('everyone');
-  const [type, setType] = useState<'everyone' | 'role' | 'direct'>('everyone');
-  const [receiverObject, setReceiverObject] = useState<
-    'everyone' | HMSRole | HMSRemotePeer
-  >('everyone');
-  const [showBanner, setShowBanner] = useState<boolean>(false);
+  const [filter, setFilter] = useState('everyone');
+  const [type, setType] = useState('everyone');
+  const [receiverObject, setReceiverObject] = useState('everyone');
+  const [showBanner, setShowBanner] = useState(false);
   const [text, setText] = useState('');
 
-  const setSessionMetaData = async (value: string | null) => {
+  const setSessionMetaData = async value => {
     // If instance of HMSSessionStore is available
     if (hmsSessionStore) {
       try {
@@ -305,17 +266,17 @@ export const ChatWindow = ({localPeer}: {localPeer?: HMSLocalPeer}) => {
 
   const sendMessage = () => {
     if (text.length > 0 && hmsInstance) {
-      let hmsMessageRecipient: HMSMessageRecipient;
+      let hmsMessageRecipient;
 
       if (type === 'role') {
         hmsMessageRecipient = new HMSMessageRecipient({
           recipientType: HMSMessageRecipientType.ROLES,
-          recipientRoles: [receiverObject as HMSRole],
+          recipientRoles: [receiverObject],
         });
       } else if (type === 'direct') {
         hmsMessageRecipient = new HMSMessageRecipient({
           recipientType: HMSMessageRecipientType.PEER,
-          recipientPeer: receiverObject as HMSPeer,
+          recipientPeer: receiverObject,
         });
       } else {
         hmsMessageRecipient = new HMSMessageRecipient({
@@ -329,11 +290,7 @@ export const ChatWindow = ({localPeer}: {localPeer?: HMSLocalPeer}) => {
 
       setText('');
 
-      const handleMessageID = ({
-        messageId,
-      }: {
-        messageId: string | undefined;
-      }) => {
+      const handleMessageID = ({messageId}) => {
         if (messageId) {
           const localMessage = new HMSMessage({
             messageId: messageId,
@@ -349,11 +306,11 @@ export const ChatWindow = ({localPeer}: {localPeer?: HMSLocalPeer}) => {
 
       if (type === 'role') {
         hmsInstance
-          .sendGroupMessage(messageText, [receiverObject as HMSRole])
+          .sendGroupMessage(messageText, [receiverObject])
           .then(handleMessageID);
       } else if (type === 'direct') {
         hmsInstance
-          .sendDirectMessage(messageText, receiverObject as HMSPeer)
+          .sendDirectMessage(messageText, receiverObject)
           .then(handleMessageID);
       } else {
         hmsInstance.sendBroadcastMessage(messageText).then(handleMessageID);
@@ -426,8 +383,7 @@ export const ChatWindow = ({localPeer}: {localPeer?: HMSLocalPeer}) => {
         <ChatList setSessionMetaData={setSessionMetaData} />
       </View>
       <View
-        style={bottom === 0 ? styles.inputContainer : {marginBottom: bottom}}
-      >
+        style={bottom === 0 ? styles.inputContainer : {marginBottom: bottom}}>
         <CustomInput
           value={text}
           onChangeText={setText}

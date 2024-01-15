@@ -1,16 +1,7 @@
 import React, {useEffect, useState} from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableWithoutFeedback,
-  Image,
-} from 'react-native';
+import {View, Text, StyleSheet, Image} from 'react-native';
 import Feather from 'react-native-vector-icons/Feather';
 import {
-  HMSLocalPeer,
-  HMSRoom,
-  HMSTrack,
   HMSTrackSource,
   HMSTrackType,
   HMSVideoViewMode,
@@ -18,7 +9,6 @@ import {
 import {useSelector} from 'react-redux';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 
-import type {RootState} from '../redux';
 import {COLORS} from '../utils/theme';
 import {CustomButton} from './CustomButton';
 import {getInitials} from '../utils/functions';
@@ -28,26 +18,19 @@ export const PreviewModal = ({
   join,
   setLoadingButtonState,
   loadingButtonState,
-}: {
-  previewTracks: HMSTrack[];
-  join: Function;
-  setLoadingButtonState: React.Dispatch<React.SetStateAction<boolean>>;
-  loadingButtonState: boolean;
 }) => {
-  const hmsInstance = useSelector((state: RootState) => state.user.hmsInstance);
+  const hmsInstance = useSelector(state => state.user.hmsInstance);
   const {top, bottom, left, right} = useSafeAreaInsets();
-  const mirrorCamera = useSelector(
-    (state: RootState) => state.app.joinConfig.mirrorCamera,
-  );
+  const mirrorCamera = useSelector(state => state.app.joinConfig.mirrorCamera);
   const autoSimulcast = useSelector(
-    (state: RootState) => state.app.joinConfig.autoSimulcast,
+    state => state.app.joinConfig.autoSimulcast,
   );
 
-  const [previewVideoTrack, setPreviewVideoTrack] = useState<HMSTrack>();
+  const [previewVideoTrack, setPreviewVideoTrack] = useState();
 
-  const [isAudioMute, setIsAudioMute] = useState<boolean>();
-  const [isVideoMute, setIsVideoMute] = useState<boolean>();
-  const [previewPeer, setPreviewPeer] = useState<HMSLocalPeer>();
+  const [isAudioMute, setIsAudioMute] = useState();
+  const [isVideoMute, setIsVideoMute] = useState();
+  const [previewPeer, setPreviewPeer] = useState();
   const [numberOfLines, setNumberOfLines] = useState(true);
 
   const HmsView = hmsInstance?.HmsView;

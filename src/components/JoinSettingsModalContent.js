@@ -22,7 +22,6 @@ import {
   android as hmsAndroidSdkVersion,
 } from '@100mslive/react-native-hms/sdk-versions.json';
 import {SwitchRow} from './SwitchRow';
-import {RootState} from '../redux';
 import {
   changeAudioMixer,
   changeShowStats,
@@ -38,13 +37,9 @@ import {
   changeShowHLSStats,
 } from '../redux/actions';
 
-interface JoinSettingsModalContentProps {}
-
-export const JoinSettingsModalContent: React.FC<
-  JoinSettingsModalContentProps
-> = () => {
+export const JoinSettingsModalContent = () => {
   const dispatch = useDispatch();
-  const joinConfig = useSelector((state: RootState) => state.app.joinConfig);
+  const joinConfig = useSelector(state => state.app.joinConfig);
   const {
     mutedAudio,
     mutedVideo,
@@ -217,8 +212,7 @@ export const JoinSettingsModalContent: React.FC<
 
           <TouchableOpacity
             style={styles.resetBtn}
-            onPress={() => dispatch(resetJoinConfig())}
-          >
+            onPress={() => dispatch(resetJoinConfig())}>
             <FontAwesomeIcons
               name="rotate-left"
               size={16}

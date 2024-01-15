@@ -1,49 +1,31 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  ViewStyle,
-  TouchableOpacity,
-  StyleProp,
-  TextStyle,
-} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 
-export enum LiveStates {
-  LIVE = 10,
-  BEHIND_LIVE = 20,
-  LOADING_LIVE = 30,
-}
+export let LiveStates;
+(function (LiveStates) {
+  LiveStates[(LiveStates['LIVE'] = 10)] = 'LIVE';
+  LiveStates[(LiveStates['BEHIND_LIVE'] = 20)] = 'BEHIND_LIVE';
+  LiveStates[(LiveStates['LOADING_LIVE'] = 30)] = 'LOADING_LIVE';
+})(LiveStates || (LiveStates = {}));
 
-export interface LiveButtonProps {
-  containerStyle?: StyleProp<ViewStyle>;
-  isLive: boolean;
-  onPress(): void;
-  disabled?: boolean;
-  size?: 'normal' | 'small';
-}
-
-const LiveButton: React.FC<LiveButtonProps> = ({
+const LiveButton = ({
   containerStyle,
   isLive,
   onPress,
   disabled,
   size = 'normal',
 }) => {
-  const textStyle: StyleProp<TextStyle> =
-    size !== 'normal' ? {fontSize: 10} : null;
-  const indicatorStyle: StyleProp<ViewStyle> =
+  const textStyle = size !== 'normal' ? {fontSize: 10} : null;
+  const indicatorStyle =
     size !== 'normal' ? {width: 4, height: 4, borderRadius: 2} : null;
-  const pressableStyle: StyleProp<ViewStyle> =
-    size !== 'normal' ? {padding: 4} : null;
+  const pressableStyle = size !== 'normal' ? {padding: 4} : null;
 
   return (
     <View style={containerStyle}>
       <TouchableOpacity
         onPress={onPress}
         style={[styles.touchable, pressableStyle]}
-        disabled={disabled}
-      >
+        disabled={disabled}>
         <View
           style={[
             styles.liveIndicator,

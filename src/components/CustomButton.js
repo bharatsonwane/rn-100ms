@@ -1,11 +1,8 @@
 import React from 'react';
 import {
-  StyleProp,
   StyleSheet,
   Text,
-  TextStyle,
   TouchableOpacity,
-  ViewStyle,
   ActivityIndicator,
 } from 'react-native';
 import {COLORS} from '../utils/theme';
@@ -19,15 +16,6 @@ const CustomButton = ({
   viewStyle,
   LeftIcon,
   RightIcon,
-}: {
-  title?: string;
-  onPress: Function;
-  textStyle?: StyleProp<TextStyle>;
-  viewStyle?: StyleProp<ViewStyle>;
-  loading?: boolean;
-  disabled?: boolean;
-  LeftIcon?: JSX.Element;
-  RightIcon?: JSX.Element;
 }) => {
   const onButtonPress = () => {
     onPress();
@@ -42,8 +30,7 @@ const CustomButton = ({
         disabled && styles.disabled,
         loading && styles.opacity,
       ]}
-      onPress={onButtonPress}
-    >
+      onPress={onButtonPress}>
       {loading ? (
         <ActivityIndicator color={COLORS.WHITE} />
       ) : (

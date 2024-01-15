@@ -2,21 +2,14 @@ import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {useHMSHLSPlayerStats} from '@100mslive/react-native-hms';
 
-export interface HLSPlayerStatsViewProps {
-  onClosePress?: () => void;
-}
-
-export const HLSPlayerStatsView: React.FC<HLSPlayerStatsViewProps> = ({
-  onClosePress,
-}) => {
+export const HLSPlayerStatsView = ({onClosePress}) => {
   const {stats, error} = useHMSHLSPlayerStats();
 
   return (
     <View style={styles.container}>
       <TouchableOpacity
         onPress={() => onClosePress?.()}
-        style={styles.closeButton}
-      >
+        style={styles.closeButton}>
         <Text>close</Text>
       </TouchableOpacity>
 

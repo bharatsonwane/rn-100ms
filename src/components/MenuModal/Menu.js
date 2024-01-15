@@ -5,56 +5,33 @@ import {
   Dimensions,
   Easing,
   I18nManager,
-  LayoutChangeEvent,
   Modal,
   Platform,
   StatusBar,
   StyleSheet,
   TouchableWithoutFeedback,
   View,
-  ViewStyle,
 } from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 
-export interface MenuProps {
-  children?: React.ReactNode;
-  anchor?: React.ReactNode;
-  style?: ViewStyle;
-  onRequestClose?(): void;
-  animationDuration?: number;
-  testID?: string;
-  visible?: boolean;
-}
-
-enum States {
-  Hidden,
-  Animating,
-  Shown,
-}
-
-interface State {
-  buttonHeight: number;
-  buttonWidth: number;
-  left: number;
-  menuHeight: number;
-  menuSizeAnimation: Animated.ValueXY;
-  menuState: States;
-  menuWidth: number;
-  opacityAnimation: Animated.Value;
-  top: number;
-}
+var States;
+(function (States) {
+  States[(States['Hidden'] = 0)] = 'Hidden';
+  States[(States['Animating'] = 1)] = 'Animating';
+  States[(States['Shown'] = 2)] = 'Shown';
+})(States || (States = {}));
 
 const EASING = Easing.bezier(0.4, 0, 0.2, 1);
 const SCREEN_INDENT = 8;
 
-export class Menu extends React.Component<MenuProps, State> {
-  _container: View | null = null;
+export class Menu extends React.Component {
+  _container = null;
 
   static defaultProps = {
     animationDuration: 300,
   };
 
-  constructor(props: MenuProps) {
+  constructor(props) {
     super(props);
 
     this.state = {
@@ -82,7 +59,7 @@ export class Menu extends React.Component<MenuProps, State> {
     this.show();
   }
 
-  componentDidUpdate(prevProps: MenuProps) {
+  componentDidUpdate(prevProps) {
     if (prevProps.visible === this.props.visible) {
       return;
     }
@@ -94,12 +71,12 @@ export class Menu extends React.Component<MenuProps, State> {
     }
   }
 
-  private setContainerRef = (ref: View) => {
+  setContainerRef = ref => {
     this._container = ref;
   };
 
   // Start menu animation
-  private onMenuLayout = (e: LayoutChangeEvent) => {
+  onMenuLayout = e => {
     if (this.state.menuState === States.Animating) {
       return;
     }
@@ -131,7 +108,7 @@ export class Menu extends React.Component<MenuProps, State> {
     );
   };
 
-  private show = () => {
+  show = () => {
     this._container?.measureInWindow((left, top, buttonWidth, buttonHeight) => {
       this.setState({
         buttonHeight,
@@ -143,7 +120,7 @@ export class Menu extends React.Component<MenuProps, State> {
     });
   };
 
-  private hide = () => {
+  hide = () => {
     Animated.timing(this.state.opacityAnimation, {
       toValue: 0,
       duration: this.props.animationDuration,
@@ -159,7 +136,7 @@ export class Menu extends React.Component<MenuProps, State> {
     });
   };
 
-  private onRequestClose = () => {
+  onRequestClose = () => {
     this.props.onRequestClose?.();
   };
 
@@ -241,12 +218,10 @@ export class Menu extends React.Component<MenuProps, State> {
             'landscape-left',
             'landscape-right',
           ]}
-          transparent
-        >
+          transparent>
           <TouchableWithoutFeedback
             onPress={this.onRequestClose}
-            accessible={false}
-          >
+            accessible={false}>
             <View style={StyleSheet.absoluteFill}>
               <Animated.View
                 onLayout={this.onMenuLayout}
@@ -254,15 +229,12 @@ export class Menu extends React.Component<MenuProps, State> {
                   styles.shadowMenuContainer,
                   shadowMenuContainerStyle,
                   style,
-                ]}
-              >
+                ]}>
                 <Animated.View
-                  style={[styles.menuContainer, animationStarted && menuSize]}
-                >
+                  style={[styles.menuContainer, animationStarted && menuSize]}>
                   <ScrollView
                     style={styles.children}
-                    keyboardShouldPersistTaps="always"
-                  >
+                    keyboardShouldPersistTaps="always">
                     {children}
                   </ScrollView>
                 </Animated.View>

@@ -4,28 +4,17 @@ import {useSelector} from 'react-redux';
 import {HMSTrackSource} from '@100mslive/react-native-hms';
 
 import {COLORS} from '../utils/theme';
-import {RootState} from '../redux';
 import PeerRTCStatsView from './PeerRTCStatsView';
 
-interface PeerRTCStatsContainerProps {
-  peerId: string;
-  trackId?: string;
-  trackSource?: string | number;
-}
-
-const PeerRTCStatsContainerUnmemo: React.FC<PeerRTCStatsContainerProps> = ({
-  peerId,
-  trackId,
-  trackSource,
-}) => {
-  const audioTrackStats = useSelector((state: RootState) => {
+const PeerRTCStatsContainerUnmemo = ({peerId, trackId, trackSource}) => {
+  const audioTrackStats = useSelector(state => {
     const audioStatsId =
       !trackSource || trackSource === HMSTrackSource.REGULAR
         ? peerId
         : peerId + trackSource;
     return audioStatsId ? state.app.rtcStats[audioStatsId] : null;
   });
-  const videoTrackStats = useSelector((state: RootState) => {
+  const videoTrackStats = useSelector(state => {
     const videoStats = trackId ? state.app.rtcStats[trackId] : null;
 
     if (Array.isArray(videoStats) && videoStats.length === 1) {

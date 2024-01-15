@@ -1,22 +1,10 @@
 import {useSelector} from 'react-redux';
-import {
-  HMSHLSPlayerPlaybackCue,
-  HMSPeer,
-  useHMSHLSPlayerCue,
-} from '@100mslive/react-native-hms';
+import {useHMSHLSPlayerCue} from '@100mslive/react-native-hms';
 
-import {RootState} from '../redux';
 import Toast from 'react-native-simple-toast';
 
-interface EmoticonMessage extends HMSHLSPlayerPlaybackCue {
-  type: string;
-  senderId: string;
-  emojiId: string;
-  sender: HMSPeer | undefined;
-}
-
 export const HLSPlayerEmoticons = () => {
-  const hmsInstance = useSelector((state: RootState) => state.user.hmsInstance);
+  const hmsInstance = useSelector(state => state.user.hmsInstance);
 
   useHMSHLSPlayerCue(cue => {
     if (!hmsInstance) {
@@ -27,7 +15,7 @@ export const HLSPlayerEmoticons = () => {
 
     if (typeof payloadStr === 'string') {
       try {
-        const emoticonMessage: EmoticonMessage = JSON.parse(payloadStr);
+        const emoticonMessage = JSON.parse(payloadStr);
         if (emoticonMessage.type === 'EMOJI_REACTION') {
           const peer = hmsInstance.getPeerFromPeerId(emoticonMessage.senderId);
           Toast.showWithGravity(
@@ -47,7 +35,7 @@ export const HLSPlayerEmoticons = () => {
   return null;
 };
 
-const emojiMap: Record<string, string> = {
+const emojiMap = {
   '+1': '👍',
   '-1': '👎',
   wave: '👋',
@@ -60,4 +48,4 @@ const emojiMap: Record<string, string> = {
   sob: '😭',
 };
 
-const getEmojiByString = (emojiCode: string) => emojiMap[emojiCode] || '👍';
+const getEmojiByString = emojiCode => emojiMap[emojiCode] || '👍';

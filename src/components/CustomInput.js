@@ -1,14 +1,10 @@
 import React from 'react';
 import {
-  ReturnKeyTypeOptions,
-  StyleProp,
   StyleSheet,
   Text,
   TextInput,
-  TextStyle,
   TouchableOpacity,
   View,
-  ViewStyle,
 } from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
@@ -33,42 +29,10 @@ const CustomInput = ({
   autoCapitalize = 'none',
   autoCorrect = false,
   autoCompleteType = 'off',
-}: {
-  value?: string;
-  title?: string;
-  onChangeText: Function;
-  placeholderTextColor?: string;
-  placeholder?: string;
-  textStyle?: StyleProp<TextStyle>;
-  viewStyle?: StyleProp<ViewStyle>;
-  clearButtonStyle?: StyleProp<ViewStyle>;
-  inputStyle?: StyleProp<ViewStyle>;
-  defaultValue?: string;
-  returnKeyType?: ReturnKeyTypeOptions;
-  multiline?: boolean;
-  blurOnSubmit?: boolean;
-  disableFullscreenUI?: boolean;
-  clear?: boolean;
-  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
-  autoCorrect?: boolean;
-  autoCompleteType?:
-    | 'off'
-    | 'cc-csc'
-    | 'cc-exp'
-    | 'cc-exp-month'
-    | 'cc-exp-year'
-    | 'cc-number'
-    | 'email'
-    | 'name'
-    | 'password'
-    | 'postal-code'
-    | 'street-address'
-    | 'tel'
-    | 'username';
 }) => {
   const showClear = clear && value !== undefined && value?.length > 0;
 
-  const onChange = (newValue: string) => {
+  const onChange = newValue => {
     onChangeText(newValue);
   };
 
@@ -102,8 +66,7 @@ const CustomInput = ({
             onPress={() => {
               onChange('');
             }}
-            style={[styles.clearContainer, clearButtonStyle]}
-          >
+            style={[styles.clearContainer, clearButtonStyle]}>
             <MaterialIcons name="clear" style={styles.clearIcon} size={24} />
           </TouchableOpacity>
         )}

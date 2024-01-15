@@ -1,35 +1,14 @@
 import React from 'react';
 import {View, TouchableOpacity, Text, StyleSheet} from 'react-native';
 import {useSelector} from 'react-redux';
-import {
-  HMSLocalPeer,
-  HMSPeer,
-  HMSTrack,
-  HMSTrackSource,
-} from '@100mslive/react-native-hms';
+import {HMSTrackSource} from '@100mslive/react-native-hms';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import type {RootState} from '../redux';
 import {COLORS} from '../utils/theme';
-import {PeerTrackNode} from '../utils/types';
 import {isTileOnSpotlight} from '../utils/functions';
 
-interface PeerSettingsModalContentProps {
-  localPeer: HMSLocalPeer;
-  peerTrackNode: PeerTrackNode;
-  cancelModal(): void;
-  onChangeNamePress(peer: HMSPeer): void;
-  onChangeRolePress(peer: HMSPeer): void;
-  onSetVolumePress(peer: HMSPeer): void;
-  onCaptureScreenShotPress(node: PeerTrackNode): void;
-  onCaptureImageAtMaxSupportedResolutionPress(node: PeerTrackNode): void;
-  onStreamingQualityPress(track: HMSTrack): void;
-}
-
-export const PeerSettingsModalContent: React.FC<
-  PeerSettingsModalContentProps
-> = ({
+export const PeerSettingsModalContent = ({
   localPeer,
   peerTrackNode,
   cancelModal,
@@ -40,13 +19,9 @@ export const PeerSettingsModalContent: React.FC<
   onCaptureImageAtMaxSupportedResolutionPress,
   onStreamingQualityPress,
 }) => {
-  const hmsInstance = useSelector((state: RootState) => state.user.hmsInstance);
-  const hmsSessionStore = useSelector(
-    (state: RootState) => state.user.hmsSessionStore,
-  );
-  const spotlightTrackId = useSelector(
-    (state: RootState) => state.user.spotlightTrackId,
-  );
+  const hmsInstance = useSelector(state => state.user.hmsInstance);
+  const hmsSessionStore = useSelector(state => state.user.hmsSessionStore);
+  const spotlightTrackId = useSelector(state => state.user.spotlightTrackId);
 
   const removePeer = () => {
     hmsInstance
@@ -65,8 +40,8 @@ export const PeerSettingsModalContent: React.FC<
     }
 
     hmsInstance?.changeTrackState(
-      peerTrackNode.peer.audioTrack!!,
-      !peerTrackNode.peer.audioTrack!!.isMute(),
+      peerTrackNode.peer.audioTrack,
+      !peerTrackNode.peer.audioTrack.isMute(),
     );
   };
 
@@ -78,8 +53,8 @@ export const PeerSettingsModalContent: React.FC<
     }
 
     hmsInstance?.changeTrackState(
-      peerTrackNode.peer.videoTrack!!,
-      !peerTrackNode.peer.videoTrack!!.isMute(),
+      peerTrackNode.peer.videoTrack,
+      !peerTrackNode.peer.videoTrack.isMute(),
     );
   };
 
@@ -201,7 +176,8 @@ export const PeerSettingsModalContent: React.FC<
             IconType={MaterialCommunityIcons}
             iconName={'cellphone-screenshot'}
             onPress={() => onCaptureScreenShotPress(peerTrackNode)}
-            disabled={!peerTrackNode.track || peerTrackNode.track.isMute()} // Capture Screenshot option should be disable, if track is muted or not available
+            // Capture Screenshot option should be disable, if track is muted or not available
+            disabled={!peerTrackNode.track || peerTrackNode.track.isMute()}
           />
         )}
 
@@ -214,7 +190,8 @@ export const PeerSettingsModalContent: React.FC<
             onPress={() =>
               onCaptureImageAtMaxSupportedResolutionPress(peerTrackNode)
             }
-            disabled={!peerTrackNode.track || peerTrackNode.track.isMute()} // Local Image Capture option should be disable, if track is muted or not available
+            // Local Image Capture option should be disable, if track is muted or not available
+            disabled={!peerTrackNode.track || peerTrackNode.track.isMute()}
           />
         ) : null}
 
@@ -229,7 +206,8 @@ export const PeerSettingsModalContent: React.FC<
                 ? onStreamingQualityPress(peerTrackNode.track)
                 : null
             }
-            disabled={!peerTrackNode.track || peerTrackNode.track.isMute()} // Streaming Quality option should be disable, if track is muted or not available
+            // Streaming Quality option should be disable, if track is muted or not available
+            disabled={!peerTrackNode.track || peerTrackNode.track.isMute()}
           />
         ) : null}
       </View>
@@ -237,27 +215,12 @@ export const PeerSettingsModalContent: React.FC<
   );
 };
 
-interface SettingItemProps {
-  onPress(): void;
-  text: string;
-  iconName: string;
-  IconType: any;
-  disabled?: boolean;
-}
-
-const SettingItem: React.FC<SettingItemProps> = ({
-  onPress,
-  text,
-  iconName,
-  IconType,
-  disabled = false,
-}) => {
+const SettingItem = ({onPress, text, iconName, IconType, disabled = false}) => {
   return (
     <TouchableOpacity
       disabled={disabled}
       style={[styles.button, disabled ? {opacity: 0.6} : null]}
-      onPress={onPress}
-    >
+      onPress={onPress}>
       <IconType name={iconName} size={24} style={styles.icon} />
 
       <Text style={styles.text}>{text}</Text>

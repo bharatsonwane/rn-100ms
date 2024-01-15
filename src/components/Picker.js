@@ -1,13 +1,5 @@
 import React, {useState} from 'react';
-import {
-  Platform,
-  StyleProp,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-  ViewStyle,
-} from 'react-native';
+import {Platform, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
 import {Menu, MenuItem} from './MenuModal';
@@ -18,13 +10,8 @@ export const CustomPicker = ({
   selectedItem,
   onItemSelected,
   viewStyle,
-}: {
-  data: any[];
-  selectedItem: any;
-  onItemSelected: React.Dispatch<React.SetStateAction<any>>;
-  viewStyle?: StyleProp<ViewStyle>;
 }) => {
-  const [visible, setVisible] = useState<boolean>(false);
+  const [visible, setVisible] = useState(false);
 
   const hideMenu = () => setVisible(false);
   const showMenu = () => setVisible(true);
@@ -35,8 +22,7 @@ export const CustomPicker = ({
       anchor={
         <TouchableOpacity
           style={[styles.chatFilterContainer, viewStyle]}
-          onPress={showMenu}
-        >
+          onPress={showMenu}>
           <Text style={styles.chatFilterText} numberOfLines={1}>
             {selectedItem}
           </Text>
@@ -48,8 +34,7 @@ export const CustomPicker = ({
         </TouchableOpacity>
       }
       onRequestClose={hideMenu}
-      style={styles.chatMenuContainer}
-    >
+      style={styles.chatMenuContainer}>
       {data?.map(value => {
         return (
           <MenuItem
@@ -57,8 +42,7 @@ export const CustomPicker = ({
               hideMenu();
               onItemSelected(value);
             }}
-            key={value}
-          >
+            key={value}>
             <View style={styles.chatMenuItem}>
               <Text style={styles.chatMenuItemName}>{value}</Text>
             </View>
