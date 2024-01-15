@@ -4,25 +4,14 @@ import {HMSTrackSource} from '@100mslive/react-native-hms';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Feather from 'react-native-vector-icons/Feather';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import type {HMSView} from '@100mslive/react-native-hms';
 
 import {styles} from './styles';
 
 import {getDisplayTrackDimensions, parseMetadata} from '../../utils/functions';
 import {DisplayTrack} from './DisplayTrack';
 import {COLORS} from '../../utils/theme';
-import type {PeerTrackNode} from '../../utils/types';
 
-interface TileProps {
-  totalTilesInContainer: number;
-  orientation: boolean;
-  peerTrackNode: PeerTrackNode;
-  onPeerTileMorePress(peerTrackNode: PeerTrackNode): void;
-  setHmsViewRefs(viewId: string, ref: typeof HMSView | null): void;
-  setIsScreenShared: React.Dispatch<React.SetStateAction<boolean | undefined>>;
-}
-
-const TileUnmemoized: React.FC<TileProps> = ({
+const TileUnmemoized = ({
   onPeerTileMorePress,
   peerTrackNode,
   orientation,
@@ -47,8 +36,7 @@ const TileUnmemoized: React.FC<TileProps> = ({
                 orientation,
               ),
             },
-      ]}
-    >
+      ]}>
       <DisplayTrack
         // saving HmsView ref in collection with uniqueId as key
         ref={ref => setHmsViewRefs(peerTrackNode.id, ref)}
@@ -68,8 +56,7 @@ const TileUnmemoized: React.FC<TileProps> = ({
             padding: 8,
             backgroundColor: COLORS.SECONDARY.DISABLED,
             borderRadius: 18,
-          }}
-        >
+          }}>
           <Feather name="more-horizontal" style={styles.mic} size={20} />
         </TouchableOpacity>
       </View>

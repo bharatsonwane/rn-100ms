@@ -1,22 +1,12 @@
 import React from 'react';
 import {View, Dimensions} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import type {HMSView} from '@100mslive/react-native-hms';
 
 import {styles} from './styles';
 
 import {Tile} from './Tile';
-import type {PeerTrackNode} from '../../utils/types';
 
-interface TilesContainerProps {
-  peerTrackNodes: PeerTrackNode[];
-  onPeerTileMorePress(peerTrackNode: PeerTrackNode): void;
-  orientation: boolean;
-  setHmsViewRefs(viewId: string, ref: typeof HMSView | null): void;
-  setIsScreenShared: React.Dispatch<React.SetStateAction<boolean | undefined>>;
-}
-
-const TilesContainerUnmemoized: React.FC<TilesContainerProps> = ({
+const TilesContainerUnmemoized = ({
   peerTrackNodes,
   orientation,
   setHmsViewRefs,
@@ -30,8 +20,7 @@ const TilesContainerUnmemoized: React.FC<TilesContainerProps> = ({
       style={[
         styles.page,
         {width: Dimensions.get('window').width - left - right},
-      ]}
-    >
+      ]}>
       {peerTrackNodes?.map((peerTrackNode, _idx, arr) => (
         <Tile
           key={peerTrackNode.id}

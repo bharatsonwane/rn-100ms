@@ -1,40 +1,23 @@
-import React, {ElementRef, useRef, useState, useImperativeHandle} from 'react';
+import React, {useRef, useState, useImperativeHandle} from 'react';
 import {View, FlatList} from 'react-native';
-import type {HMSView, HMSPeer} from '@100mslive/react-native-hms';
 
 import {DefaultModal} from '../../components';
 import {SaveScreenshot} from './Modals';
 import {TilesContainer} from './TilesContainer';
-import type {PeerTrackNode} from '../../utils/types';
 
-type GridViewProps = {
-  onPeerTileMorePress(peerTrackNode: PeerTrackNode): void;
-  pairedPeers: PeerTrackNode[][];
-  orientation: boolean;
-  setIsScreenShared: React.Dispatch<React.SetStateAction<boolean | undefined>>;
-};
-
-type GridViewRefAttrs = {
-  captureViewScreenshot(node: PeerTrackNode): any;
-  getFlatlistRef(): React.RefObject<FlatList<any>>;
-};
-
-const GridView = React.forwardRef<GridViewRefAttrs, GridViewProps>(
+const GridView = React.forwardRef(
   ({pairedPeers, orientation, onPeerTileMorePress, setIsScreenShared}, ref) => {
     // hooks
-    const [screenshotData, setScreenshotData] = useState<{
-      peer: HMSPeer;
-      source: {uri: string};
-    } | null>(null);
-    const hmsViewRefs = useRef<Record<string, ElementRef<typeof HMSView>>>({});
-    const flatlistRef = useRef<FlatList>(null);
+    const [screenshotData, setScreenshotData] = useState(null);
+    const hmsViewRefs = useRef({});
+    const flatlistRef = useRef(null);
 
     // We are setting `captureViewScreenshot` method on ref passed to GridView component
     // `captureViewScreenshot` method can be called to with PeerTrackNode to capture the HmsView Snapshot
     useImperativeHandle(
       ref,
       () => ({
-        captureViewScreenshot: (node: PeerTrackNode) => {
+        captureViewScreenshot: node => {
           // getting HmsView ref for the passed PeerTrackNode
           const hmsViewRef = hmsViewRefs.current[node.id];
 
@@ -47,7 +30,7 @@ const GridView = React.forwardRef<GridViewRefAttrs, GridViewProps>(
           // Calling `capture` method on HmsView ref
           hmsViewRef
             .capture?.()
-            .then((imageBase64: string) => {
+            .then(imageBase64 => {
               console.log('HmsView Capture Success');
               // Saving data needed to show captured snapshot in "Save Snapshot" Modal
               setScreenshotData({
@@ -55,9 +38,7 @@ const GridView = React.forwardRef<GridViewRefAttrs, GridViewProps>(
                 source: {uri: `data:image/png;base64,${imageBase64}`},
               });
             })
-            .catch((error: any) =>
-              console.warn('HmsView Capture Error: ', error),
-            );
+            .catch(error => console.warn('HmsView Capture Error: ', error));
         },
         getFlatlistRef: () => {
           return flatlistRef;
@@ -66,12 +47,9 @@ const GridView = React.forwardRef<GridViewRefAttrs, GridViewProps>(
       [],
     );
 
-    const setHmsViewRefs = React.useCallback(
-      (viewId: string, ref: typeof HMSView | null) => {
-        hmsViewRefs.current[viewId] = ref;
-      },
-      [],
-    );
+    const setHmsViewRefs = React.useCallback((viewId, ref) => {
+      hmsViewRefs.current[viewId] = ref;
+    }, []);
 
     const _renderItem = React.useCallback(
       ({item}) => {
@@ -110,8 +88,7 @@ const GridView = React.forwardRef<GridViewRefAttrs, GridViewProps>(
         <DefaultModal
           modalPosiion="center"
           modalVisible={!!screenshotData}
-          setModalVisible={() => setScreenshotData(null)}
-        >
+          setModalVisible={() => setScreenshotData(null)}>
           <SaveScreenshot
             imageSource={screenshotData?.source}
             peer={screenshotData?.peer}

@@ -1,25 +1,14 @@
 import {
-  HMSAudioFilePlayerNode,
   HMSAudioMixingMode,
   HMSAudioMode,
-  HMSChangeTrackStateRequest,
-  HMSException,
-  HMSLocalPeer,
-  HMSMessage,
-  HMSPeer,
   HMSPeerUpdate,
-  HMSRoleChangeRequest,
-  HMSRoom,
   HMSRoomUpdate,
-  HMSSDK,
-  HMSTrack,
   HMSTrackSource,
   HMSTrackType,
   HMSTrackUpdate,
   HMSUpdateListenerActions,
   HMSPIPListenerActions,
   HMSCameraControl,
-  HMSSessionStoreValue,
 } from '@100mslive/react-native-hms';
 import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {
@@ -39,25 +28,17 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useDispatch, useSelector} from 'react-redux';
 import Toast from 'react-native-simple-toast';
-import {RouteProp, useNavigation, useRoute} from '@react-navigation/native';
-import type {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import DocumentPicker from 'react-native-document-picker';
+import {useNavigation, useRoute} from '@react-navigation/native';
 
 import {styles} from './styles';
 import {
-  AlertModal,
   ChatWindow,
   CustomButton,
   DefaultModal,
   Menu,
   MenuItem,
 } from '../../components';
-import {
-  LayoutParams,
-  ModalTypes,
-  PeerTrackNode,
-  PipModes,
-} from '../../utils/types';
+import {LayoutParams, ModalTypes, PipModes} from '../../utils/types';
 import {
   createPeerTrackNode,
   getPeerNodes,
@@ -92,8 +73,6 @@ import {
   RtcStatsModal,
   SaveScreenshot,
 } from './Modals';
-import type {RootState} from '../../redux';
-import type {AppStackParamList} from '../../navigator';
 import {
   addMessage,
   addPinnedMessage,
@@ -111,60 +90,48 @@ import {RoomSettingsModalContent} from '../../components/RoomSettingsModalConten
 import {PeerSettingsModalContent} from '../../components/PeerSettingsModalContent';
 import {StreamingQualityModalContent} from '../../components/StreamingQualityModalContent';
 
-type MeetingScreenProp = NativeStackNavigationProp<
-  AppStackParamList,
-  'MeetingScreen'
->;
-
-type MeetingScreenRouteProp = RouteProp<AppStackParamList>;
-
 const Meeting = () => {
   // hooks
   const dispatch = useDispatch();
-  const modalTaskRef = useRef<any>(null);
+  const modalTaskRef = useRef(null);
   const orientation = useOrientation();
-  const hmsInstance = useSelector((state: RootState) => state.user.hmsInstance);
+  const hmsInstance = useSelector(state => state.user.hmsInstance);
   const isPipModeActive = useSelector(
-    (state: RootState) => state.app.pipModeStatus === PipModes.ACTIVE,
+    state => state.app.pipModeStatus === PipModes.ACTIVE,
   );
 
   // useState hook
-  const [room, setRoom] = useState<HMSRoom>();
-  const [localPeer, setLocalPeer] = useState<HMSLocalPeer>();
-  const [isAudioMute, setIsAudioMute] = useState<boolean | undefined>(
+  const [room, setRoom] = useState();
+  const [localPeer, setLocalPeer] = useState();
+  const [isAudioMute, setIsAudioMute] = useState(
     localPeer?.audioTrack?.isMute(),
   );
-  const [isVideoMute, setIsVideoMute] = useState<boolean | undefined>(
+  const [isVideoMute, setIsVideoMute] = useState(
     localPeer?.videoTrack?.isMute(),
   );
-  const [isScreenShared, setIsScreenShared] = useState<boolean | undefined>(
+  const [isScreenShared, setIsScreenShared] = useState(
     localPeer?.auxiliaryTracks && localPeer?.auxiliaryTracks?.length > 0,
   );
-  const [modalVisible, setModalVisible] = useState<ModalTypes>(
-    ModalTypes.DEFAULT,
-  );
+  const [modalVisible, setModalVisible] = useState(ModalTypes.DEFAULT);
 
-  const handleModalVisible = React.useCallback(
-    (modalType: ModalTypes, delay = false) => {
-      if (delay) {
-        setModalVisible(ModalTypes.DEFAULT);
+  const handleModalVisible = React.useCallback((modalType, delay = false) => {
+    if (delay) {
+      setModalVisible(ModalTypes.DEFAULT);
 
-        const task = () => {
-          setModalVisible(modalType);
-          modalTaskRef.current = null;
-        };
-
-        if (Platform.OS === 'android') {
-          modalTaskRef.current = InteractionManager.runAfterInteractions(task);
-        } else {
-          modalTaskRef.current = setTimeout(task, 500);
-        }
-      } else {
+      const task = () => {
         setModalVisible(modalType);
+        modalTaskRef.current = null;
+      };
+
+      if (Platform.OS === 'android') {
+        modalTaskRef.current = InteractionManager.runAfterInteractions(task);
+      } else {
+        modalTaskRef.current = setTimeout(task, 500);
       }
-    },
-    [],
-  );
+    } else {
+      setModalVisible(modalType);
+    }
+  }, []);
 
   const updateLocalPeer = () => {
     hmsInstance?.getLocalPeer().then(peer => {
@@ -272,58 +239,37 @@ const Meeting = () => {
   );
 };
 
-const DisplayView = (data: {
-  room?: HMSRoom;
-  localPeer?: HMSLocalPeer;
-  modalVisible: ModalTypes;
-  setModalVisible(modalType: ModalTypes, delay?: any): void;
-  setRoom: React.Dispatch<React.SetStateAction<HMSRoom | undefined>>;
-  setLocalPeer: React.Dispatch<React.SetStateAction<HMSLocalPeer | undefined>>;
-  setIsAudioMute: React.Dispatch<React.SetStateAction<boolean | undefined>>;
-  setIsVideoMute: React.Dispatch<React.SetStateAction<boolean | undefined>>;
-  setIsScreenShared: React.Dispatch<React.SetStateAction<boolean | undefined>>;
-}) => {
+const DisplayView = data => {
   // hooks
-  const {params} = useRoute<MeetingScreenRouteProp>();
+  const {params} = useRoute();
   const isPipModeActive = useSelector(
-    (state: RootState) => state.app.pipModeStatus === PipModes.ACTIVE,
+    state => state.app.pipModeStatus === PipModes.ACTIVE,
   );
-  const hmsInstance = useSelector((state: RootState) => state.user.hmsInstance);
-  const hmsSessionStore = useSelector(
-    (state: RootState) => state.user.hmsSessionStore,
-  );
+  const hmsInstance = useSelector(state => state.user.hmsInstance);
+  const hmsSessionStore = useSelector(state => state.user.hmsSessionStore);
 
   // State to track active spotlight trackId
-  const spotlightTrackId = useSelector(
-    (state: RootState) => state.user.spotlightTrackId,
-  );
-  const peerState = useSelector((state: RootState) => state.app.peerState);
-  const navigate = useNavigation<MeetingScreenProp>().navigate;
+  const spotlightTrackId = useSelector(state => state.user.spotlightTrackId);
+  const peerState = useSelector(state => state.app.peerState);
+  const navigate = useNavigation().navigate;
   const dispatch = useDispatch();
 
   // useState hook
-  const [peerTrackNodes, setPeerTrackNodes] =
-    useState<Array<PeerTrackNode>>(peerState);
+  const [peerTrackNodes, setPeerTrackNodes] = useState(peerState);
   const [orientation, setOrientation] = useState(true);
-  const [layout, setLayout] = useState<LayoutParams>(
+  const [layout, setLayout] = useState(
     params?.isHLSViewer ? LayoutParams.HLS : LayoutParams.GRID,
   );
-  const [updatePeer, setUpdatePeer] = useState<HMSPeer>();
-  const [selectedPeerTrackNode, setSelectedPeerTrackNode] =
-    useState<PeerTrackNode | null>(null);
-  const [roleChangeRequest, setRoleChangeRequest] = useState<{
-    requestedBy?: string;
-    suggestedRole?: string;
-  }>({});
-  const [capturedImagePath, setCapturedImagePath] = useState<null | {
-    uri: string;
-  }>(null);
+  const [updatePeer, setUpdatePeer] = useState();
+  const [selectedPeerTrackNode, setSelectedPeerTrackNode] = useState(null);
+  const [roleChangeRequest, setRoleChangeRequest] = useState({});
+  const [capturedImagePath, setCapturedImagePath] = useState(null);
 
   // useRef hook
-  const sessionStoreListeners = useRef<Array<{remove: () => void}>>([]);
-  const gridViewRef = useRef<React.ElementRef<typeof GridView> | null>(null);
+  const sessionStoreListeners = useRef([]);
+  const gridViewRef = useRef(null);
   const peerTrackNodesRef = useRef(peerTrackNodes);
-  const trackToChangeRef = useRef<null | HMSTrack>(null);
+  const trackToChangeRef = useRef(null);
 
   // constants
   const pairedPeers = useMemo(
@@ -373,7 +319,7 @@ const DisplayView = (data: {
   }, [peerState]);
 
   // listeners
-  const onErrorListener = (error: HMSException) => {
+  const onErrorListener = error => {
     if (Platform.OS === 'android') {
       if (error?.code === 4005 || error?.code === 1003) {
         destroy();
@@ -391,20 +337,14 @@ const DisplayView = (data: {
     );
   };
 
-  const onRoomListener = ({
-    room,
-    type,
-  }: {
-    room: HMSRoom;
-    type: HMSRoomUpdate;
-  }) => {
+  const onRoomListener = ({room, type}) => {
     data?.setRoom(room);
 
     if (type === HMSRoomUpdate.BROWSER_RECORDING_STATE_UPDATED) {
       let streaming = room?.browserRecordingState?.running;
       const startAtDate = room?.browserRecordingState?.startedAt;
 
-      let startTime: null | string = null;
+      let startTime = null;
 
       if (startAtDate) {
         let hours = startAtDate.getHours().toString();
@@ -433,7 +373,7 @@ const DisplayView = (data: {
       let streaming = room?.rtmpHMSRtmpStreamingState?.running;
       const startAtDate = room?.rtmpHMSRtmpStreamingState?.startedAt;
 
-      let startTime: null | string = null;
+      let startTime = null;
 
       if (startAtDate) {
         let hours = startAtDate.getHours().toString();
@@ -454,7 +394,7 @@ const DisplayView = (data: {
       let streaming = room?.serverRecordingState?.running;
       const startAtDate = room?.serverRecordingState?.startedAt;
 
-      let startTime: null | string = null;
+      let startTime = null;
 
       if (startAtDate) {
         let hours = startAtDate.getHours().toString();
@@ -474,13 +414,7 @@ const DisplayView = (data: {
     }
   };
 
-  const onPeerListener = ({
-    peer,
-    type,
-  }: {
-    peer: HMSPeer;
-    type: HMSPeerUpdate;
-  }) => {
+  const onPeerListener = ({peer, type}) => {
     if (type === HMSPeerUpdate.PEER_JOINED) {
       return;
     }
@@ -556,15 +490,7 @@ const DisplayView = (data: {
     // }
   };
 
-  const onTrackListener = ({
-    peer,
-    track,
-    type,
-  }: {
-    peer: HMSPeer;
-    track: HMSTrack;
-    type: HMSTrackUpdate;
-  }) => {
+  const onTrackListener = ({peer, track, type}) => {
     if (type === HMSTrackUpdate.TRACK_ADDED) {
       const nodesPresent = getPeerTrackNodes(
         peerTrackNodesRef?.current,
@@ -665,9 +591,7 @@ const DisplayView = (data: {
     }
   };
 
-  const onChangeTrackStateRequestListener = (
-    request: HMSChangeTrackStateRequest,
-  ) => {
+  const onChangeTrackStateRequestListener = request => {
     if (!request?.mute) {
       data?.setModalVisible(ModalTypes.CHANGE_TRACK, true);
       setRoleChangeRequest({
@@ -683,7 +607,7 @@ const DisplayView = (data: {
     }
   };
 
-  const onRoleChangeRequestListener = (request: HMSRoleChangeRequest) => {
+  const onRoleChangeRequestListener = request => {
     data?.setModalVisible(ModalTypes.CHANGE_ROLE_ACCEPT, true);
     setRoleChangeRequest({
       requestedBy: request?.requestedBy?.name,
@@ -695,12 +619,12 @@ const DisplayView = (data: {
     await destroy();
   };
 
-  const onMessageListener = (message: HMSMessage) => {
+  const onMessageListener = message => {
     dispatch(addMessage(message));
   };
 
   // functions
-  const updateHmsInstance = (hms?: HMSSDK) => {
+  const updateHmsInstance = hms => {
     hms?.addEventListener(
       HMSUpdateListenerActions.ON_ROOM_UPDATE,
       onRoomListener,
@@ -745,7 +669,7 @@ const DisplayView = (data: {
     hms?.addEventListener(HMSPIPListenerActions.ON_PIP_ROOM_LEAVE, destroy);
   };
 
-  const removeHmsInstanceListeners = (hms?: HMSSDK) => {
+  const removeHmsInstanceListeners = hms => {
     hms?.removeEventListener(HMSUpdateListenerActions.ON_ROOM_UPDATE);
     hms?.removeEventListener(HMSUpdateListenerActions.ON_PEER_UPDATE);
     hms?.removeEventListener(HMSUpdateListenerActions.ON_TRACK_UPDATE);
@@ -762,11 +686,7 @@ const DisplayView = (data: {
     hms?.removeEventListener(HMSPIPListenerActions.ON_PIP_ROOM_LEAVE);
   };
 
-  const changePeerTrackNodes = (
-    nodesPresent: PeerTrackNode[],
-    peer: HMSPeer,
-    track: HMSTrack,
-  ) => {
+  const changePeerTrackNodes = (nodesPresent, peer, track) => {
     const updatedPeerTrackNodes = updatePeerTrackNodes(
       nodesPresent,
       peer,
@@ -780,7 +700,7 @@ const DisplayView = (data: {
     setPeerTrackNodes(newPeerTrackNodes);
   };
 
-  const changePeerNodes = (nodesPresent: PeerTrackNode[], peer: HMSPeer) => {
+  const changePeerNodes = (nodesPresent, peer) => {
     const updatedPeerTrackNodes = updatePeerNodes(nodesPresent, peer);
     const newPeerTrackNodes = replacePeerTrackNodes(
       peerTrackNodesRef?.current,
@@ -790,7 +710,7 @@ const DisplayView = (data: {
     setPeerTrackNodes(newPeerTrackNodes);
   };
 
-  const removePeerTrackNodes = (peer: HMSPeer) => {
+  const removePeerTrackNodes = peer => {
     const newPeerTrackNodes = peerTrackNodesRef?.current?.filter(
       peerTrackNode => {
         if (peerTrackNode.peer.peerID === peer.peerID) {
@@ -850,46 +770,44 @@ const DisplayView = (data: {
       .catch(e => console.log('EndRoom Error: ', e));
   };
 
-  const onChangeNamePress = (peer: HMSPeer) => {
+  const onChangeNamePress = peer => {
     setUpdatePeer(peer);
     data?.setModalVisible(ModalTypes.CHANGE_NAME, true);
   };
 
   const handlePeerTileMorePress = React.useCallback(
-    (peerTrackNode: PeerTrackNode) => {
+    peerTrackNode => {
       setSelectedPeerTrackNode(peerTrackNode);
       data?.setModalVisible(ModalTypes.PEER_SETTINGS);
     },
     [data?.setModalVisible],
   );
 
-  const onChangeRolePress = (peer: HMSPeer) => {
+  const onChangeRolePress = peer => {
     setUpdatePeer(peer);
     data?.setModalVisible(ModalTypes.CHANGE_ROLE, true);
   };
 
-  const onSetVolumePress = (peer: HMSPeer) => {
+  const onSetVolumePress = peer => {
     setUpdatePeer(peer);
     data?.setModalVisible(ModalTypes.VOLUME, true);
   };
 
-  const handleCaptureScreenShotPress = (node: PeerTrackNode) => {
+  const handleCaptureScreenShotPress = node => {
     data?.setModalVisible(ModalTypes.DEFAULT);
     InteractionManager.runAfterInteractions(() => {
       gridViewRef.current?.captureViewScreenshot(node);
     });
   };
 
-  const handleCaptureImageAtMaxSupportedResolutionPress = (
-    _node: PeerTrackNode,
-  ) => {
+  const handleCaptureImageAtMaxSupportedResolutionPress = _node => {
     data?.setModalVisible(ModalTypes.DEFAULT);
     InteractionManager.runAfterInteractions(async () => {
       const permission = await requestExternalStoragePermission();
 
       if (hmsInstance && permission) {
         HMSCameraControl.captureImageAtMaxSupportedResolution(true)
-          .then((imagePath: string) => {
+          .then(imagePath => {
             console.log(
               'captureImageAtMaxSupportedResolution result -> ',
               imagePath,
@@ -897,7 +815,7 @@ const DisplayView = (data: {
             data?.setModalVisible(ModalTypes.DEFAULT);
             setCapturedImagePath({uri: `file://${imagePath}`});
           })
-          .catch((error: any) => {
+          .catch(error => {
             console.warn(
               'captureImageAtMaxSupportedResolution error -> ',
               error,
@@ -907,7 +825,7 @@ const DisplayView = (data: {
     });
   };
 
-  const handleStreamingQualityPress = (track: HMSTrack) => {
+  const handleStreamingQualityPress = track => {
     trackToChangeRef.current = track;
     data?.setModalVisible(ModalTypes.STREAMING_QUALITY_SETTING, true);
   };
@@ -925,11 +843,11 @@ const DisplayView = (data: {
   useEffect(() => {
     // Check if instance of HMSSessionStore is available
     if (hmsSessionStore) {
-      let toastTimeoutId: NodeJS.Timeout | null = null;
+      let toastTimeoutId = null;
 
       const addSessionStoreListeners = () => {
         // Handle 'spotlight' key values
-        const handleSpotlightIdChange = (id: HMSSessionStoreValue) => {
+        const handleSpotlightIdChange = id => {
           // Scroll to start of the list
           if (id) {
             gridViewRef.current
@@ -941,7 +859,7 @@ const DisplayView = (data: {
         };
 
         // Handle 'pinnedMessage' key values
-        const handlePinnedMessageChange = (data: HMSSessionStoreValue) => {
+        const handlePinnedMessageChange = data => {
           dispatch(addPinnedMessage(data));
         };
 
@@ -979,69 +897,70 @@ const DisplayView = (data: {
             ),
           );
 
-        let lastSpotlightValue: HMSSessionStoreValue = null;
-        let lastPinnedMessageValue: HMSSessionStoreValue = null;
+        let lastSpotlightValue = null;
+        let lastPinnedMessageValue = null;
 
         // Add subscription for `spotlight` & `pinnedMessage` keys updates on Session Store
-        const subscription = hmsSessionStore.addKeyChangeListener<
-          ['spotlight', 'pinnedMessage']
-        >(['spotlight', 'pinnedMessage'], (error, data) => {
-          // If error occurs, handle error and return early
-          if (error !== null) {
-            console.log(
-              '`spotlight` & `pinnedMessage` key listener Error -> ',
-              error,
-            );
-            return;
-          }
+        const subscription = hmsSessionStore.addKeyChangeListener(
+          ['spotlight', 'pinnedMessage'],
+          (error, data) => {
+            // If error occurs, handle error and return early
+            if (error !== null) {
+              console.log(
+                '`spotlight` & `pinnedMessage` key listener Error -> ',
+                error,
+              );
+              return;
+            }
 
-          // If no error, handle data
-          if (data !== null) {
-            switch (data.key) {
-              case 'spotlight': {
-                handleSpotlightIdChange(data.value);
+            // If no error, handle data
+            if (data !== null) {
+              switch (data.key) {
+                case 'spotlight': {
+                  handleSpotlightIdChange(data.value);
 
-                // Showing Toast message if value has actually changed
-                if (
-                  data.value !== lastSpotlightValue &&
-                  (data.value || lastSpotlightValue)
-                ) {
-                  Toast.showWithGravity(
-                    `SessionStore: \`spotlight\` key's value changed to ${data.value}`,
-                    Toast.LONG,
-                    Toast.TOP,
-                  );
-                }
-
-                lastSpotlightValue = data.value;
-                break;
-              }
-              case 'pinnedMessage': {
-                handlePinnedMessageChange(data.value);
-
-                // Showing Toast message if value has actually changed
-                if (
-                  data.value !== lastPinnedMessageValue &&
-                  (data.value || lastPinnedMessageValue)
-                ) {
-                  if (toastTimeoutId !== null) {
-                    clearTimeout(toastTimeoutId);
-                  }
-                  toastTimeoutId = setTimeout(() => {
+                  // Showing Toast message if value has actually changed
+                  if (
+                    data.value !== lastSpotlightValue &&
+                    (data.value || lastSpotlightValue)
+                  ) {
                     Toast.showWithGravity(
-                      `SessionStore: \`pinnedMessage\` key's value changed to ${data.value}`,
+                      `SessionStore: \`spotlight\` key's value changed to ${data.value}`,
                       Toast.LONG,
                       Toast.TOP,
                     );
-                  }, 1500);
-                }
+                  }
 
-                lastPinnedMessageValue = data.value;
-                break;
+                  lastSpotlightValue = data.value;
+                  break;
+                }
+                case 'pinnedMessage': {
+                  handlePinnedMessageChange(data.value);
+
+                  // Showing Toast message if value has actually changed
+                  if (
+                    data.value !== lastPinnedMessageValue &&
+                    (data.value || lastPinnedMessageValue)
+                  ) {
+                    if (toastTimeoutId !== null) {
+                      clearTimeout(toastTimeoutId);
+                    }
+                    toastTimeoutId = setTimeout(() => {
+                      Toast.showWithGravity(
+                        `SessionStore: \`pinnedMessage\` key's value changed to ${data.value}`,
+                        Toast.LONG,
+                        Toast.TOP,
+                      );
+                    }, 1500);
+                  }
+
+                  lastPinnedMessageValue = data.value;
+                  break;
+                }
               }
             }
-          }
-        });
+          },
+        );
 
         // Save reference of `subscription` in a ref
         sessionStoreListeners.current.push(subscription);
@@ -1301,17 +1220,10 @@ const Header = ({
   modalVisible,
   landscapeLayout,
   setModalVisible,
-}: {
-  room?: HMSRoom;
-  localPeer?: HMSLocalPeer;
-  isScreenShared?: boolean;
-  modalVisible: ModalTypes;
-  landscapeLayout: boolean;
-  setModalVisible(modalType: ModalTypes, delay?: any): void;
 }) => {
   // hooks
-  const hmsInstance = useSelector((state: RootState) => state.user.hmsInstance);
-  const roomCode = useSelector((state: RootState) => state.user.roomCode);
+  const hmsInstance = useSelector(state => state.user.hmsInstance);
+  const roomCode = useSelector(state => state.user.roomCode);
 
   // constants
   const iconSize = 20;
@@ -1529,40 +1441,24 @@ const Footer = ({
   setIsAudioMute,
   setIsVideoMute,
   setIsScreenShared,
-}: {
-  isHlsStreaming?: boolean;
-  isBrowserRecording?: boolean;
-  isHlsRecording?: boolean;
-  isRtmpStreaming?: boolean;
-  localPeer?: HMSLocalPeer;
-  modalVisible: ModalTypes;
-  isAudioMute?: boolean;
-  isVideoMute?: boolean;
-  isScreenShared?: boolean;
-  landscapeLayout: boolean;
-  setModalVisible(modalType: ModalTypes, delay?: any): void;
-  setIsAudioMute: React.Dispatch<React.SetStateAction<boolean | undefined>>;
-  setIsVideoMute: React.Dispatch<React.SetStateAction<boolean | undefined>>;
-  setIsScreenShared: React.Dispatch<React.SetStateAction<boolean | undefined>>;
 }) => {
   // hooks
   const dispatch = useDispatch();
-  const hmsInstance = useSelector((state: RootState) => state.user.hmsInstance);
-  const roomID = useSelector((state: RootState) => state.user.roomID);
+  const hmsInstance = useSelector(state => state.user.hmsInstance);
+  const roomID = useSelector(state => state.user.roomID);
   const isPipActive = useSelector(
-    (state: RootState) => state.app.pipModeStatus === PipModes.ACTIVE,
+    state => state.app.pipModeStatus === PipModes.ACTIVE,
   );
 
   // useState hook
   const [muteAllTracksAudio, setMuteAllTracksAudio] = useState(false);
   const [isAudioShared, setIsAudioShared] = useState(false);
   const [audioDeviceChangeListener, setAudioDeviceChangeListener] =
-    useState<boolean>(false);
-  const [newAudioMixingMode, setNewAudioMixingMode] =
-    useState<HMSAudioMixingMode>(HMSAudioMixingMode.TALK_AND_MUSIC);
-  const [audioMode, setAudioMode] = useState<HMSAudioMode>(
-    HMSAudioMode.MODE_NORMAL,
+    useState(false);
+  const [newAudioMixingMode, setNewAudioMixingMode] = useState(
+    HMSAudioMixingMode.TALK_AND_MUSIC,
   );
+  const [audioMode, setAudioMode] = useState(HMSAudioMode.MODE_NORMAL);
 
   // constants
   const iconSize = 20;

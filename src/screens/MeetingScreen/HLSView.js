@@ -1,55 +1,32 @@
-import React, {ComponentRef, useRef} from 'react';
+import React, {useRef} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {View, Text} from 'react-native';
 import {HMSHLSPlayer} from '@100mslive/react-native-hms';
-import type {HMSRoom} from '@100mslive/react-native-hms';
 
 import {styles} from './styles';
 
-import {RootState} from '../../redux';
 import {changeShowHLSStats} from '../../redux/actions';
 import {HLSPlayerStatsView} from '../../components/HLSPlayerStatsView';
 import {HLSPlayerEmoticons} from '../../components/HLSPlayerEmoticons';
 import {CustomControls} from '../../components/CustomHLSPlayerControls';
 
-type HLSViewProps = {
-  room?: HMSRoom;
-};
-
-const HLSView = ({room}: HLSViewProps) => {
+const HLSView = ({room}) => {
   const dispatch = useDispatch();
-  const hmsHlsPlayerRef = useRef<ComponentRef<typeof HMSHLSPlayer>>(null);
-  const showHLSStats = useSelector(
-    (state: RootState) => state.app.joinConfig.showHLSStats,
-  );
+  const hmsHlsPlayerRef = useRef(null);
+  const showHLSStats = useSelector(state => state.app.joinConfig.showHLSStats);
   const showCustomHLSPlayerControls = useSelector(
-    (state: RootState) => state.app.joinConfig.showCustomHLSPlayerControls,
+    state => state.app.joinConfig.showCustomHLSPlayerControls,
   );
   const enableHLSPlayerControls = useSelector(
-    (state: RootState) => state.app.joinConfig.enableHLSPlayerControls,
+    state => state.app.joinConfig.enableHLSPlayerControls,
   );
-  const hlsAspectRatio = useSelector(
-    (state: RootState) => state.app.hlsAspectRatio,
-  );
+  const hlsAspectRatio = useSelector(state => state.app.hlsAspectRatio);
 
   const handleClosePress = () => {
     dispatch(changeShowHLSStats(false));
   };
 
-  const hlsPlayerActions = <
-    T extends
-      | 'play'
-      | 'stop'
-      | 'pause'
-      | 'resume'
-      | 'seekForward'
-      | 'seekBackward'
-      | 'seekToLive'
-      | 'setVolume',
-  >(
-    action: T,
-    ...args: any[]
-  ) => {
+  const hlsPlayerActions = (action, ...args) => {
     switch (action) {
       case 'play': {
         hmsHlsPlayerRef.current?.play(args[0]);

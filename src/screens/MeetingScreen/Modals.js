@@ -8,29 +8,17 @@ import {
   FlatList,
   StyleSheet,
   Image,
-  Platform,
   InteractionManager,
-  ImageURISource,
   useWindowDimensions,
 } from 'react-native';
 import Toast from 'react-native-simple-toast';
 import {useDispatch, useSelector} from 'react-redux';
 import {
-  HMSTrack,
-  HMSRole,
-  HMSSDK,
   HMSTrackType,
   HMSTrackSource,
-  HMSPeer,
   HMSAudioDevice,
-  HMSAudioMode,
   HMSAudioMixingMode,
-  HMSHLSMeetingURLVariant,
-  HMSHLSRecordingConfig,
   HMSHLSConfig,
-  HMSRTMPConfig,
-  HMSLocalPeer,
-  HMSRemotePeer,
 } from '@100mslive/react-native-hms';
 import Feather from 'react-native-vector-icons/Feather';
 import Entypo from 'react-native-vector-icons/Entypo';
@@ -56,20 +44,13 @@ import {
   changeShowStats,
   saveUserData,
 } from '../../redux/actions';
+import {parseMetadata, getInitials, getTime} from '../../utils/functions';
 import {
-  parseMetadata,
-  getInitials,
-  requestExternalStoragePermission,
-  getTime,
-} from '../../utils/functions';
-import {
-  LayoutParams,
   ModalTypes,
   SUPPORTED_ASPECT_RATIOS,
   SortingType,
 } from '../../utils/types';
 import {COLORS} from '../../utils/theme';
-import type {RootState} from '../../redux';
 import {SwitchRow} from '../../components/SwitchRow';
 
 export const ParticipantsModal = ({
@@ -78,41 +59,32 @@ export const ParticipantsModal = ({
   changeName,
   changeRole,
   setVolume,
-}: {
-  instance?: HMSSDK;
-  localPeer?: HMSLocalPeer;
-  changeName: (peer: HMSPeer) => void;
-  changeRole: (peer: HMSPeer) => void;
-  setVolume: (peer: HMSPeer) => void;
 }) => {
   // useState hook
-  const [hmsPeers, setHmsPeers] = useState<(HMSLocalPeer | HMSRemotePeer)[]>([
-    localPeer!,
-  ]);
+  const [hmsPeers, setHmsPeers] = useState([localPeer]);
   const [participantsSearchInput, setParticipantsSearchInput] = useState('');
-  const [visible, setVisible] = useState<number>(-1);
-  const [filteredPeerTrackNodes, setFilteredPeerTrackNodes] =
-    useState<(HMSLocalPeer | HMSRemotePeer)[]>();
+  const [visible, setVisible] = useState(-1);
+  const [filteredPeerTrackNodes, setFilteredPeerTrackNodes] = useState();
   const [filter, setFilter] = useState('everyone');
   // constants
   const localPeerPermissions = localPeer?.role?.permissions;
 
   // functions
   const hideMenu = () => setVisible(-1);
-  const showMenu = (index: number) => setVisible(index);
-  const onChangeNamePress = (peer: HMSPeer) => {
+  const showMenu = index => setVisible(index);
+  const onChangeNamePress = peer => {
     hideMenu();
     setTimeout(() => {
       changeName(peer);
     }, 500);
   };
-  const onChangeRolePress = (peer: HMSPeer) => {
+  const onChangeRolePress = peer => {
     hideMenu();
     setTimeout(() => {
       changeRole(peer);
     }, 500);
   };
-  const onSetVolumePress = (peer: HMSPeer) => {
+  const onSetVolumePress = peer => {
     hideMenu();
     setTimeout(() => {
       setVolume(peer);
@@ -144,17 +116,17 @@ export const ParticipantsModal = ({
   //     ?.isPlaybackAllowed();
   //   remotePeer?.remoteVideoTrack()?.setPlaybackAllowed(!playbackAllowed);
   // };
-  const removePeer = (peer: HMSPeer) => {
+  const removePeer = peer => {
     hideMenu();
     instance
       ?.removePeer(peer, 'removed from room')
       .then(d => console.log('Remove Peer Success: ', d))
       .catch(e => {
         console.log('Remove Peer Error: ', e);
-        Toast.showWithGravity((e as Error).message, Toast.LONG, Toast.TOP);
+        Toast.showWithGravity(e.message, Toast.LONG, Toast.TOP);
       });
   };
-  const toggleAudio = (peer: HMSPeer) => {
+  const toggleAudio = peer => {
     hideMenu();
     if (peer?.audioTrack) {
       instance
@@ -163,7 +135,7 @@ export const ParticipantsModal = ({
         .catch(e => console.log('Toggle Audio Error: ', e));
     }
   };
-  const toggleVideo = (peer: HMSPeer) => {
+  const toggleVideo = peer => {
     hideMenu();
     if (peer?.videoTrack) {
       instance
@@ -423,16 +395,10 @@ export const ParticipantsModal = ({
   );
 };
 
-const ParticipantFilter = ({
-  filter,
-  setFilter,
-}: {
-  filter?: string;
-  setFilter: React.Dispatch<React.SetStateAction<string>>;
-}) => {
-  const roles = useSelector((state: RootState) => state.user.roles);
+const ParticipantFilter = ({filter, setFilter}) => {
+  const roles = useSelector(state => state.user.roles);
 
-  const [visible, setVisible] = useState<boolean>(false);
+  const [visible, setVisible] = useState(false);
 
   const hideMenu = () => setVisible(false);
   const showMenu = () => setVisible(true);
@@ -490,7 +456,7 @@ const ParticipantFilter = ({
           <MenuItem
             onPress={() => {
               hideMenu();
-              setFilter(knownRole?.name!);
+              setFilter(knownRole?.name);
             }}
             key={knownRole.name}>
             <View style={styles.participantMenuItem}>
@@ -505,27 +471,19 @@ const ParticipantFilter = ({
   );
 };
 
-export const ChangeRoleModal = ({
-  instance,
-  peer,
-  cancelModal,
-}: {
-  instance?: HMSSDK;
-  peer?: HMSPeer;
-  cancelModal: Function;
-}) => {
-  const roles = useSelector((state: RootState) => state.user.roles);
+export const ChangeRoleModal = ({instance, peer, cancelModal}) => {
+  const roles = useSelector(state => state.user.roles);
 
-  const [newRole, setNewRole] = useState<HMSRole>(peer?.role!);
-  const [request, setRequest] = useState<boolean>(false);
-  const [visible, setVisible] = useState<boolean>(false);
+  const [newRole, setNewRole] = useState(peer?.role);
+  const [request, setRequest] = useState(false);
+  const [visible, setVisible] = useState(false);
 
   const hideMenu = () => setVisible(false);
   const showMenu = () => setVisible(true);
   const changeRole = () => {
-    instance?.changeRoleOfPeer(peer!, newRole, !request).catch(e => {
+    instance?.changeRoleOfPeer(peer, newRole, !request).catch(e => {
       console.log('Change Role of Peer Error: ', e);
-      Toast.showWithGravity((e as Error).message, Toast.LONG, Toast.TOP);
+      Toast.showWithGravity(e.message, Toast.LONG, Toast.TOP);
     });
     cancelModal();
   };
@@ -609,22 +567,14 @@ export const ChangeRoleModal = ({
   );
 };
 
-export const SaveScreenshot = ({
-  imageSource,
-  peer,
-  cancelModal,
-}: {
-  peer?: HMSPeer;
-  imageSource?: Required<Pick<ImageURISource, 'uri'>> | null;
-  cancelModal: Function;
-}) => {
+export const SaveScreenshot = ({imageSource, peer, cancelModal}) => {
   /**
    * Get target path on external storage to save image
    * @param {string} imageExtension file extension to use for image
    * @param {string} peerName name of peer to use in image name
    * @returns string - path on external storage to save image
    */
-  const getTargetPath = (imageExtension: string, peerName?: string) => {
+  const getTargetPath = (imageExtension, peerName) => {
     // // formatting peer name
     // const formattedPeerName = peerName
     //   ? peerName.replace(/ /g, '-').toLowerCase()
@@ -738,16 +688,8 @@ export const SaveScreenshot = ({
   );
 };
 
-export const ChangeVolumeModal = ({
-  instance,
-  peer,
-  cancelModal,
-}: {
-  instance?: HMSSDK;
-  peer?: HMSPeer;
-  cancelModal: Function;
-}) => {
-  const [volume, setVolume] = useState<number>(0);
+export const ChangeVolumeModal = ({instance, peer, cancelModal}) => {
+  const [volume, setVolume] = useState(0);
 
   const changeVolume = () => {
     if (peer?.audioTrack) {
@@ -766,7 +708,7 @@ export const ChangeVolumeModal = ({
           maximumValue={10}
           minimumValue={0}
           step={1}
-          onValueChange={(value: any) => setVolume(value[0])}
+          onValueChange={value => setVolume(value[0])}
         />
       </View>
       <View style={styles.roleChangeModalPermissionContainer}>
@@ -787,18 +729,10 @@ export const ChangeVolumeModal = ({
   );
 };
 
-export const ChangeNameModal = ({
-  instance,
-  peer,
-  cancelModal,
-}: {
-  instance?: HMSSDK;
-  peer?: HMSPeer;
-  cancelModal: Function;
-}) => {
+export const ChangeNameModal = ({instance, peer, cancelModal}) => {
   const dispatch = useDispatch();
 
-  const [name, setName] = useState<string>(peer?.name!);
+  const [name, setName] = useState(peer?.name);
 
   const changeName = () => {
     if (name.length > 0) {
@@ -847,30 +781,21 @@ export const ChangeNameModal = ({
   );
 };
 
-interface RTCTrack {
-  name: string;
-  peerId?: string; // peerId is used to get audio track stats
-  track?: HMSTrack;
-}
-
 export const RtcStatsModal = () => {
   const dispatch = useDispatch();
-  const instance = useSelector((state: RootState) => state.user.hmsInstance);
-  const showStatsOnTiles = useSelector(
-    (state: RootState) => state.app.joinConfig.showStats,
-  );
+  const instance = useSelector(state => state.user.hmsInstance);
+  const showStatsOnTiles = useSelector(state => state.app.joinConfig.showStats);
 
-  const [localPeer, setLocalPeer] = useState<HMSLocalPeer | null>(null);
-  const [remotePeers, setRemotePeers] = useState<HMSRemotePeer[]>([]);
-  const [tracksListModalVisible, setTracksListModalVisible] =
-    useState<boolean>(false);
-  const [currentTrack, setCurrentTrack] = useState<RTCTrack | null>(null);
+  const [localPeer, setLocalPeer] = useState(null);
+  const [remotePeers, setRemotePeers] = useState([]);
+  const [tracksListModalVisible, setTracksListModalVisible] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState(null);
 
   const hideMenu = () => setTracksListModalVisible(false);
   const showMenu = () => setTracksListModalVisible(true);
 
   const getStatsList = () => {
-    const list: RTCTrack[] = [];
+    const list = [];
 
     if (localPeer?.audioTrack?.trackId) {
       list.push({
@@ -944,7 +869,7 @@ export const RtcStatsModal = () => {
     ? currentTrack.peerId || currentTrack.track?.trackId
     : null;
 
-  const rtcStatsData = useSelector((state: RootState) =>
+  const rtcStatsData = useSelector(state =>
     selectedTrackId ? state.app.rtcStats[selectedTrackId] : null,
   );
 
@@ -1064,13 +989,7 @@ export const RtcStatsModal = () => {
   );
 };
 
-export const LeaveRoomModal = ({
-  onSuccess,
-  cancelModal,
-}: {
-  onSuccess: Function;
-  cancelModal: Function;
-}) => {
+export const LeaveRoomModal = ({onSuccess, cancelModal}) => {
   const onLeave = () => {
     cancelModal();
     onSuccess();
@@ -1111,13 +1030,7 @@ export const LeaveRoomModal = ({
   );
 };
 
-export const EndRoomModal = ({
-  onSuccess,
-  cancelModal,
-}: {
-  onSuccess: Function;
-  cancelModal: Function;
-}) => {
+export const EndRoomModal = ({onSuccess, cancelModal}) => {
   const onEnd = () => {
     cancelModal();
     onSuccess();
@@ -1161,18 +1074,11 @@ export const EndRoomModal = ({
   );
 };
 
-export const ChangeAudioOutputModal = ({
-  instance,
-  cancelModal,
-}: {
-  instance?: HMSSDK;
-  cancelModal: Function;
-}) => {
-  const [currentOutputDevice, setCurrentOutputDevice] =
-    useState<HMSAudioDevice>(HMSAudioDevice.SPEAKER_PHONE);
-  const [audioOutputDevicesList, setAudioOutputDevicesList] = useState<
-    HMSAudioDevice[]
-  >([]);
+export const ChangeAudioOutputModal = ({instance, cancelModal}) => {
+  const [currentOutputDevice, setCurrentOutputDevice] = useState(
+    HMSAudioDevice.SPEAKER_PHONE,
+  );
+  const [audioOutputDevicesList, setAudioOutputDevicesList] = useState([]);
 
   const switchAudioOutput = () => {
     instance?.switchAudioOutput(currentOutputDevice);
@@ -1230,18 +1136,10 @@ export const ChangeAudioOutputModal = ({
   );
 };
 
-export const ChangeAspectRatio = ({
-  instance,
-  cancelModal,
-}: {
-  instance?: HMSSDK;
-  cancelModal: Function;
-}) => {
+export const ChangeAspectRatio = ({instance, cancelModal}) => {
   const {height} = useWindowDimensions();
   const dispatch = useDispatch();
-  const hlsPlayerAspectRatio = useSelector(
-    (state: RootState) => state.app.hlsAspectRatio,
-  );
+  const hlsPlayerAspectRatio = useSelector(state => state.app.hlsAspectRatio);
   const [selectedRatio, setSelectedRatio] = useState(hlsPlayerAspectRatio);
 
   const handleChangePress = () => {
@@ -1303,14 +1201,8 @@ export const ChangeAudioModeModal = ({
   cancelModal,
   audioMode,
   setAudioMode,
-}: {
-  instance?: HMSSDK;
-  audioMode: HMSAudioMode;
-  setAudioMode: React.Dispatch<React.SetStateAction<HMSAudioMode>>;
-  cancelModal: Function;
 }) => {
-  const [currentAudioMode, setCurrentAudioMode] =
-    useState<HMSAudioMode>(audioMode);
+  const [currentAudioMode, setCurrentAudioMode] = useState(audioMode);
 
   const AudioModeList = [
     'MODE_NORMAL',
@@ -1374,13 +1266,6 @@ export const ChangeAudioMixingModeModal = ({
   newAudioMixingMode,
   cancelModal,
   setNewAudioMixingMode,
-}: {
-  instance?: HMSSDK;
-  newAudioMixingMode: HMSAudioMixingMode;
-  cancelModal: Function;
-  setNewAudioMixingMode: React.Dispatch<
-    React.SetStateAction<HMSAudioMixingMode>
-  >;
 }) => {
   const changeAudioMixingMode = async () => {
     await instance?.setAudioMixingMode(newAudioMixingMode);
@@ -1404,7 +1289,7 @@ export const ChangeAudioMixingModeModal = ({
             key={audioMixingMode}
             style={styles.roleChangeModalPermissionContainer}
             onPress={() => {
-              setNewAudioMixingMode(audioMixingMode as HMSAudioMixingMode);
+              setNewAudioMixingMode(audioMixingMode);
             }}>
             <View style={styles.roleChangeModalCheckBox}>
               {newAudioMixingMode === audioMixingMode && (
@@ -1444,13 +1329,8 @@ export const ChangeSortingModal = ({
   selectedItem,
   onItemSelected,
   cancelModal,
-}: {
-  data: SortingType[];
-  selectedItem: SortingType | undefined;
-  onItemSelected: React.Dispatch<React.SetStateAction<SortingType | undefined>>;
-  cancelModal: Function;
 }) => {
-  const [sortingType, setSortingType] = useState<SortingType>(
+  const [sortingType, setSortingType] = useState(
     selectedItem || SortingType.DEFAULT,
   );
 
@@ -1491,13 +1371,8 @@ export const ChangeLayoutModal = ({
   selectedItem,
   onItemSelected,
   cancelModal,
-}: {
-  data: LayoutParams[];
-  selectedItem: LayoutParams;
-  onItemSelected: React.Dispatch<React.SetStateAction<LayoutParams>>;
-  cancelModal: Function;
 }) => {
-  const [layout, setLayout] = useState<LayoutParams>(selectedItem);
+  const [layout, setLayout] = useState(selectedItem);
 
   const changeLayout = () => {
     onItemSelected(layout);
@@ -1535,17 +1410,13 @@ export const ChangeTrackStateForRoleModal = ({
   instance,
   localPeer,
   cancelModal,
-}: {
-  instance?: HMSSDK;
-  localPeer?: HMSLocalPeer;
-  cancelModal: Function;
 }) => {
-  const roles = useSelector((state: RootState) => state.user.roles);
+  const roles = useSelector(state => state.user.roles);
 
-  const [role, setRole] = useState<HMSRole>(localPeer?.role!);
-  const [visible, setVisible] = useState<boolean>(false);
-  const [trackType, setTrackType] = useState<HMSTrackType>(HMSTrackType.VIDEO);
-  const [trackState, setTrackState] = useState<boolean>(false);
+  const [role, setRole] = useState(localPeer?.role);
+  const [visible, setVisible] = useState(false);
+  const [trackType, setTrackType] = useState(HMSTrackType.VIDEO);
+  const [trackState, setTrackState] = useState(false);
 
   const hideMenu = () => setVisible(false);
   const showMenu = () => setVisible(true);
@@ -1694,13 +1565,6 @@ export const ChangeTrackStateModal = ({
   localPeer,
   roleChangeRequest,
   cancelModal,
-}: {
-  localPeer?: HMSLocalPeer;
-  roleChangeRequest: {
-    requestedBy?: string;
-    suggestedRole?: string;
-  };
-  cancelModal: Function;
 }) => {
   const changeLayout = () => {
     if (roleChangeRequest?.suggestedRole?.toLocaleLowerCase() === 'video') {
@@ -1737,26 +1601,16 @@ export const ChangeTrackStateModal = ({
   );
 };
 
-export const HlsStreamingModal = ({
-  instance,
-  roomID,
-  cancelModal,
-}: {
-  instance?: HMSSDK;
-  roomID: string;
-  cancelModal: Function;
-}) => {
-  const [hlsStreamingDetails, setHLSStreamingDetails] =
-    useState<HMSHLSMeetingURLVariant>({
-      meetingUrl: roomID ? roomID + '?skip_preview=true' : '',
-      metadata: '',
-    });
+export const HlsStreamingModal = ({instance, roomID, cancelModal}) => {
+  const [hlsStreamingDetails, setHLSStreamingDetails] = useState({
+    meetingUrl: roomID ? roomID + '?skip_preview=true' : '',
+    metadata: '',
+  });
   const [startHlsRetry, setStartHlsRetry] = useState(true);
-  const [hlsRecordingDetails, setHLSRecordingDetails] =
-    useState<HMSHLSRecordingConfig>({
-      singleFilePerLayer: false,
-      videoOnDemand: false,
-    });
+  const [hlsRecordingDetails, setHLSRecordingDetails] = useState({
+    singleFilePerLayer: false,
+    videoOnDemand: false,
+  });
 
   const changeLayout = () => {
     instance
@@ -1856,14 +1710,9 @@ export const RecordingModal = ({
   roomID,
   recordingModal,
   setModalVisible,
-}: {
-  instance?: HMSSDK;
-  roomID: string;
-  recordingModal: boolean;
-  setModalVisible(modalType: ModalTypes, delay?: any): void;
 }) => {
-  const [resolutionDetails, setResolutionDetails] = useState<boolean>(false);
-  const [recordingDetails, setRecordingDetails] = useState<HMSRTMPConfig>({
+  const [resolutionDetails, setResolutionDetails] = useState(false);
+  const [recordingDetails, setRecordingDetails] = useState({
     record: false,
     meetingURL: roomID ? roomID + '?token=beam_recording' : undefined,
   });
@@ -1989,7 +1838,7 @@ export const RecordingModal = ({
           maximumValue={1280}
           minimumValue={480}
           step={10}
-          onValueChange={(value: any) => {
+          onValueChange={value => {
             setRecordingDetails({
               ...recordingDetails,
               resolution: {
@@ -2010,7 +1859,7 @@ export const RecordingModal = ({
           maximumValue={1280}
           minimumValue={500}
           step={10}
-          onValueChange={(value: any) => {
+          onValueChange={value => {
             setRecordingDetails({
               ...recordingDetails,
               resolution: {
@@ -2037,13 +1886,6 @@ export const ChangeRoleAccepteModal = ({
   instance,
   roleChangeRequest,
   cancelModal,
-}: {
-  instance?: HMSSDK;
-  roleChangeRequest: {
-    requestedBy?: string;
-    suggestedRole?: string;
-  };
-  cancelModal: Function;
 }) => {
   const changeLayout = () => {
     instance?.acceptRoleChange();
@@ -2074,13 +1916,7 @@ export const ChangeRoleAccepteModal = ({
   );
 };
 
-export const EndHlsModal = ({
-  onSuccess,
-  cancelModal,
-}: {
-  onSuccess: Function;
-  cancelModal: Function;
-}) => {
+export const EndHlsModal = ({onSuccess, cancelModal}) => {
   const onEnd = () => {
     cancelModal();
     onSuccess();
@@ -2124,7 +1960,7 @@ export const EndHlsModal = ({
   );
 };
 
-export const RealTime = ({startedAt}: {startedAt?: Date}) => {
+export const RealTime = ({startedAt}) => {
   const [hour, setHour] = useState(0);
   const [minute, setMinute] = useState(0);
   const [second, setSecond] = useState(0);
@@ -2186,14 +2022,8 @@ export const RealTime = ({startedAt}: {startedAt?: Date}) => {
   );
 };
 
-export const AudioShareSetVolumeModal = ({
-  success,
-  cancel,
-}: {
-  success: Function;
-  cancel: Function;
-}) => {
-  const [volume, setVolume] = useState<number>(0);
+export const AudioShareSetVolumeModal = ({success, cancel}) => {
+  const [volume, setVolume] = useState(0);
 
   const changeVolume = () => {
     success(volume);
@@ -2210,7 +2040,7 @@ export const AudioShareSetVolumeModal = ({
           maximumValue={1}
           minimumValue={0}
           step={0.1}
-          onValueChange={(value: any) => setVolume(value[0])}
+          onValueChange={value => setVolume(value[0])}
         />
       </View>
       <View style={styles.roleChangeModalPermissionContainer}>
@@ -2231,24 +2061,18 @@ export const AudioShareSetVolumeModal = ({
   );
 };
 
-interface ChangeBulkRoleModalProps {
-  cancelModal(): void;
-}
+var RoleSelection;
+(function (RoleSelection) {
+  RoleSelection['TARGET'] = 'TARGET';
+  RoleSelection['TO_CHANGE'] = 'TO_CHANGE';
+})(RoleSelection || (RoleSelection = {}));
 
-enum RoleSelection {
-  TARGET = 'TARGET',
-  TO_CHANGE = 'TO_CHANGE',
-}
-
-export const ChangeBulkRoleModal: React.FC<ChangeBulkRoleModalProps> = ({
-  cancelModal,
-}) => {
-  const hmsInstance = useSelector((state: RootState) => state.user.hmsInstance);
-  const roles = useSelector((state: RootState) => state.user.roles);
-  const [showRolesSelectionView, setShowRolesSelectionView] =
-    useState<null | RoleSelection>(null);
-  const [targetRole, setTargetRole] = useState<HMSRole | null>(null);
-  const [rolesToChange, setRolesToChange] = useState<HMSRole[]>([]);
+export const ChangeBulkRoleModal = ({cancelModal}) => {
+  const hmsInstance = useSelector(state => state.user.hmsInstance);
+  const roles = useSelector(state => state.user.roles);
+  const [showRolesSelectionView, setShowRolesSelectionView] = useState(null);
+  const [targetRole, setTargetRole] = useState(null);
+  const [rolesToChange, setRolesToChange] = useState([]);
 
   const changeRole = async () => {
     if (!hmsInstance || !targetRole) {
@@ -2265,7 +2089,7 @@ export const ChangeBulkRoleModal: React.FC<ChangeBulkRoleModalProps> = ({
     cancelModal();
   };
 
-  const handleRoleSelection = (roleSelected: HMSRole) => {
+  const handleRoleSelection = roleSelected => {
     if (showRolesSelectionView === RoleSelection.TARGET) {
       setTargetRole(roleSelected);
     } else {

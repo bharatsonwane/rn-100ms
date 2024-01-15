@@ -1,34 +1,25 @@
 import React from 'react';
-import {View, Text, StyleProp, ViewStyle} from 'react-native';
+import {View, Text} from 'react-native';
 import {HMSTrackSource, HMSTrackType} from '@100mslive/react-native-hms';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useSelector} from 'react-redux';
-import type {HMSView} from '@100mslive/react-native-hms';
 
 import {CustomButton} from '../../components';
 import {styles} from './styles';
-import type {RootState} from '../../redux';
-import PeerDisplayView, {PeerDisplayViewProps} from './PeerDisplayView';
+import PeerDisplayView from './PeerDisplayView';
 import PeerRTCStatsContainer from '../../components/PeerRTCStatsContainer';
-
-interface DisplayTrackProps extends PeerDisplayViewProps {
-  videoStyles: StyleProp<ViewStyle>;
-  setIsScreenShared: React.Dispatch<React.SetStateAction<boolean | undefined>>;
-}
 
 // `ref` passed to DisplayTrack component will be passed to PeerDisplayView component
 // as HMSView component is being rendered inside PeerDisplayView component
-const DisplayTrack = React.forwardRef<typeof HMSView, DisplayTrackProps>(
+const DisplayTrack = React.forwardRef(
   (
     {isDegraded, isLocal, peer, videoTrack, videoStyles, setIsScreenShared},
     hmsViewRef,
   ) => {
     // hooks
-    const hmsInstance = useSelector(
-      (state: RootState) => state.user.hmsInstance,
-    );
+    const hmsInstance = useSelector(state => state.user.hmsInstance);
     const showStatsOnTiles = useSelector(
-      (state: RootState) => state.app.joinConfig.showStats,
+      state => state.app.joinConfig.showStats,
     );
 
     // functions
