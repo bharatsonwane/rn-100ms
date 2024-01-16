@@ -13,7 +13,7 @@ const INITIAL_STATE = {
 
 const userReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
-    case ActionTypes.SAVE_USER_DATA.REQUEST:
+    case ActionTypes.SAVE_USER_DATA_REQUEST:
       return {
         ...state,
         ...action.payload,

@@ -1,17 +1,17 @@
 import actionTypes from '../actionTypes';
 
 export const addMessage = data => ({
-  type: actionTypes.ADD_MESSAGE.REQUEST,
+  type: actionTypes.ADD_MESSAGE_REQUEST,
   payload: data,
 });
 
 export const addPinnedMessage = data => ({
-  type: actionTypes.ADD_PINNED_MESSAGE.REQUEST,
+  type: actionTypes.ADD_PINNED_MESSAGE_REQUEST,
   payload: data,
 });
 
 export const clearMessageData = () => ({
-  type: actionTypes.CLEAR_MESSAGE_DATA.REQUEST,
+  type: actionTypes.CLEAR_MESSAGE_DATA_REQUEST,
 });
 
 export const setPeerState = data => ({
@@ -25,11 +25,11 @@ export const changePipModeStatus = pipModeStatus => ({
 });
 
 export const clearPeerData = () => ({
-  type: actionTypes.CLEAR_PEER_DATA.REQUEST,
+  type: actionTypes.CLEAR_PEER_DATA_REQUEST,
 });
 
 export const saveUserData = data => ({
-  type: actionTypes.SAVE_USER_DATA.REQUEST,
+  type: actionTypes.SAVE_USER_DATA_REQUEST,
   payload: data,
 });
 

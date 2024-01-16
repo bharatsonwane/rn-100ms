@@ -30,7 +30,7 @@ const appReducer = (state = INITIAL_STATE, action) => {
       return {...state, pipModeStatus: action.payload.pipModeStatus};
     case ActionTypes.SET_PEER_STATE:
       return {...state, ...action.payload};
-    case ActionTypes.CLEAR_PEER_DATA.REQUEST:
+    case ActionTypes.CLEAR_PEER_DATA_REQUEST:
       return {...state, peerState: []};
     case ActionTypes.CHANGE_HLS_ASPECT_RATIO:
       return {...state, hlsAspectRatio: action.payload.hlsAspectRatio};
