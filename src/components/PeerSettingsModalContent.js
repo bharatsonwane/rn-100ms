@@ -19,9 +19,9 @@ export const PeerSettingsModalContent = ({
   onCaptureImageAtMaxSupportedResolutionPress,
   onStreamingQualityPress,
 }) => {
-  const hmsInstance = useSelector(state => state.user.hmsInstance);
-  const hmsSessionStore = useSelector(state => state.user.hmsSessionStore);
-  const spotlightTrackId = useSelector(state => state.user.spotlightTrackId);
+  const hmsInstance = useSelector(state => state.ms100.hmsInstance);
+  const hmsSessionStore = useSelector(state => state.ms100.hmsSessionStore);
+  const spotlightTrackId = useSelector(state => state.ms100.spotlightTrackId);
 
   const removePeer = () => {
     hmsInstance

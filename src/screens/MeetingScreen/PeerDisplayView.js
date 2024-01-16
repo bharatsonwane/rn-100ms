@@ -10,7 +10,7 @@ import {getInitials, isTileOnSpotlight} from '../../utils/functions';
 const PeerDisplayViewUnmemoized = React.forwardRef(
   ({isDegraded, isLocal, peer, videoTrack}, hmsViewRef) => {
     const HmsView = useSelector(
-      state => state.user.hmsInstance?.HmsView || null,
+      state => state.ms100.hmsInstance?.HmsView || null,
     );
     const mirrorCamera = useSelector(
       state => state.app.joinConfig.mirrorCamera,
@@ -18,7 +18,7 @@ const PeerDisplayViewUnmemoized = React.forwardRef(
     const autoSimulcast = useSelector(
       state => state.app.joinConfig.autoSimulcast,
     );
-    const spotlightTrackId = useSelector(state => state.user.spotlightTrackId);
+    const spotlightTrackId = useSelector(state => state.ms100.spotlightTrackId);
 
     if (!HmsView) {
       return null;

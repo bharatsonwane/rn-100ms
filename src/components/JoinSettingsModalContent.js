@@ -35,7 +35,7 @@ import {
   resetJoinConfig,
   changeMusicMode,
   changeShowHLSStats,
-} from '../redux/actions';
+} from '../redux/reducers/appSlice';
 
 export const JoinSettingsModalContent = () => {
   const dispatch = useDispatch();

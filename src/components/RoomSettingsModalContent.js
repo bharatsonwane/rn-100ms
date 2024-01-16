@@ -28,7 +28,7 @@ import {
   changeEnableHLSPlayerControls,
   changeShowHLSStats,
   changeShowCustomHLSPlayerControls,
-} from '../redux/actions';
+} from '../redux/reducers/appSlice';
 import {ModalTypes, PipModes} from '../utils/types';
 import {parseMetadata} from '../utils/functions';
 
@@ -53,7 +53,7 @@ export const RoomSettingsModalContent = ({
 
   // REDUX STATES & DISPATCH
   const dispatch = useDispatch();
-  const hmsInstance = useSelector(state => state.user.hmsInstance);
+  const hmsInstance = useSelector(state => state.ms100.hmsInstance);
   const pipModeStatus = useSelector(state => state.app.pipModeStatus);
   const audioMixer = useSelector(state => state.app.joinConfig.audioMixer);
   const showHLSStats = useSelector(state => state.app.joinConfig.showHLSStats);

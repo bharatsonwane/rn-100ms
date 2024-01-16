@@ -19,7 +19,7 @@ export const PreviewModal = ({
   setLoadingButtonState,
   loadingButtonState,
 }) => {
-  const hmsInstance = useSelector(state => state.user.hmsInstance);
+  const hmsInstance = useSelector(state => state.ms100.hmsInstance);
   const {top, bottom, left, right} = useSafeAreaInsets();
   const mirrorCamera = useSelector(state => state.app.joinConfig.mirrorCamera);
   const autoSimulcast = useSelector(

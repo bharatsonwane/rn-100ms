@@ -8,7 +8,7 @@ import {useDispatch} from 'react-redux';
 
 import {styles} from './styles';
 import {CustomButton} from '../../components';
-import {saveUserData} from '../../redux/actions';
+import {saveUserData} from '../../redux/reducers/userSlice';
 import {validateUrl} from '../../utils/functions';
 
 const QRCodeScanner = () => {

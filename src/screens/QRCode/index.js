@@ -25,7 +25,7 @@ import {
   DefaultModal,
   JoinSettingsModalContent,
 } from '../../components';
-import {saveUserData} from '../../redux/actions';
+import {saveUserData} from '../../redux/reducers/userSlice';
 import {Constants} from '../../utils/types';
 
 const QRCode = () => {

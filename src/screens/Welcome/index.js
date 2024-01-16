@@ -36,11 +36,8 @@ import Toast from 'react-native-simple-toast';
 import {useDispatch, useSelector} from 'react-redux';
 
 import {CustomButton, CustomInput, PreviewModal} from '../../components';
-import {
-  clearHmsReference,
-  saveUserData,
-  setPeerState,
-} from '../../redux/actions';
+import {setPeerState} from '../../redux/reducers/appSlice';
+import {clearHmsReference, saveUserData} from '../../redux/reducers/userSlice';
 import {
   callService,
   createPeerTrackNode,
@@ -57,8 +54,8 @@ import {styles} from './styles';
 const Welcome = () => {
   // hooks
   const {replace, navigate} = useNavigation();
-  const roomID = useSelector(state => state.user.roomID);
-  const userName = useSelector(state => state.user.userName);
+  const roomID = useSelector(state => state.ms100.roomID);
+  const userName = useSelector(state => state.ms100.userName);
   const joinConfig = useSelector(state => state.app.joinConfig);
   const {top, bottom, left, right} = useSafeAreaInsets();
   const dispatch = useDispatch();

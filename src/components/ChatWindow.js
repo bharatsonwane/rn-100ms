@@ -23,7 +23,7 @@ import {Menu, MenuDivider, MenuItem} from './MenuModal';
 import {COLORS} from '../utils/theme';
 import {CustomInput} from './CustomInput';
 import {CustomButton} from './CustomButton';
-import {addMessage} from '../redux/actions';
+import {addMessage} from '../redux/reducers/userSlice';
 
 const getTimeStringin12HourFormat = time => {
   let hours = time.getHours();
@@ -40,7 +40,7 @@ const getTimeStringin12HourFormat = time => {
 
 const ChatFilter = memo(
   ({instance, filter, setFilter, setType, setReceiverObject}) => {
-    const roles = useSelector(state => state.user.roles);
+    const roles = useSelector(state => state.ms100.roles);
 
     const [visible, setVisible] = useState(false);
     const [remotePeers, setRemotePeers] = useState();
@@ -136,7 +136,7 @@ const ChatFilter = memo(
 ChatFilter.displayName = 'ChatFilter';
 
 const ChatList = ({setSessionMetaData}) => {
-  const messages = useSelector(state => state.messages.messages);
+  const messages = useSelector(state => state.ms100.messages);
 
   // const scollviewRef = useRef<FlatList>(null);
 
@@ -238,9 +238,9 @@ const ChatList = ({setSessionMetaData}) => {
 
 export const ChatWindow = ({localPeer}) => {
   // hooks
-  const hmsInstance = useSelector(state => state.user.hmsInstance);
-  const hmsSessionStore = useSelector(state => state.user.hmsSessionStore);
-  const pinnedMessage = useSelector(state => state.messages.pinnedMessage);
+  const hmsInstance = useSelector(state => state.ms100.hmsInstance);
+  const hmsSessionStore = useSelector(state => state.ms100.hmsSessionStore);
+  const pinnedMessage = useSelector(state => state.ms100.pinnedMessage);
   const dispatch = useDispatch();
   const {bottom} = useSafeAreaInsets();
 

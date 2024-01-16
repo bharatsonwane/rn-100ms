@@ -5,7 +5,7 @@ import {HMSHLSPlayer} from '@100mslive/react-native-hms';
 
 import {styles} from './styles';
 
-import {changeShowHLSStats} from '../../redux/actions';
+import {changeShowHLSStats} from '../../redux/reducers/appSlice';
 import {HLSPlayerStatsView} from '../../components/HLSPlayerStatsView';
 import {HLSPlayerEmoticons} from '../../components/HLSPlayerEmoticons';
 import {CustomControls} from '../../components/CustomHLSPlayerControls';

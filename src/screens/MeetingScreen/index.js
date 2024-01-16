@@ -76,12 +76,15 @@ import {
 import {
   addMessage,
   addPinnedMessage,
+  clearMessageData,
+  saveUserData,
+} from '../../redux/reducers/userSlice';
+import {
   changePipModeStatus,
   clearHmsReference,
-  clearMessageData,
   clearPeerData,
-  saveUserData,
-} from '../../redux/actions';
+} from '../../redux/reducers/appSlice';
+
 import {GridView} from './GridView';
 import {HLSView} from './HLSView';
 import PIPView from './PIPView';
@@ -95,7 +98,7 @@ const Meeting = () => {
   const dispatch = useDispatch();
   const modalTaskRef = useRef(null);
   const orientation = useOrientation();
-  const hmsInstance = useSelector(state => state.user.hmsInstance);
+  const hmsInstance = useSelector(state => state.ms100.hmsInstance);
   const isPipModeActive = useSelector(
     state => state.app.pipModeStatus === PipModes.ACTIVE,
   );
@@ -245,11 +248,11 @@ const DisplayView = data => {
   const isPipModeActive = useSelector(
     state => state.app.pipModeStatus === PipModes.ACTIVE,
   );
-  const hmsInstance = useSelector(state => state.user.hmsInstance);
-  const hmsSessionStore = useSelector(state => state.user.hmsSessionStore);
+  const hmsInstance = useSelector(state => state.ms100.hmsInstance);
+  const hmsSessionStore = useSelector(state => state.ms100.hmsSessionStore);
 
   // State to track active spotlight trackId
-  const spotlightTrackId = useSelector(state => state.user.spotlightTrackId);
+  const spotlightTrackId = useSelector(state => state.ms100.spotlightTrackId);
   const peerState = useSelector(state => state.app.peerState);
   const navigate = useNavigation().navigate;
   const dispatch = useDispatch();
@@ -1222,8 +1225,8 @@ const Header = ({
   setModalVisible,
 }) => {
   // hooks
-  const hmsInstance = useSelector(state => state.user.hmsInstance);
-  const roomCode = useSelector(state => state.user.roomCode);
+  const hmsInstance = useSelector(state => state.ms100.hmsInstance);
+  const roomCode = useSelector(state => state.ms100.roomCode);
 
   // constants
   const iconSize = 20;
@@ -1444,8 +1447,8 @@ const Footer = ({
 }) => {
   // hooks
   const dispatch = useDispatch();
-  const hmsInstance = useSelector(state => state.user.hmsInstance);
-  const roomID = useSelector(state => state.user.roomID);
+  const hmsInstance = useSelector(state => state.ms100.hmsInstance);
+  const roomID = useSelector(state => state.ms100.roomID);
   const isPipActive = useSelector(
     state => state.app.pipModeStatus === PipModes.ACTIVE,
   );

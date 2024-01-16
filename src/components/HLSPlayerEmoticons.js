@@ -4,7 +4,7 @@ import {useHMSHLSPlayerCue} from '@100mslive/react-native-hms';
 import Toast from 'react-native-simple-toast';
 
 export const HLSPlayerEmoticons = () => {
-  const hmsInstance = useSelector(state => state.user.hmsInstance);
+  const hmsInstance = useSelector(state => state.ms100.hmsInstance);
 
   useHMSHLSPlayerCue(cue => {
     if (!hmsInstance) {

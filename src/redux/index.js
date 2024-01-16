@@ -1,18 +1,16 @@
-// import ms100Slice from './reducers/ms100Slice';
-import {createStore} from 'redux';
+import {configureStore, createListenerMiddleware} from '@reduxjs/toolkit';
+import userSlice from './reducers/userSlice';
+import appSlice from './reducers/appSlice';
 
-import rootReducer from './reducers/index';
+export const listenerMiddleware = createListenerMiddleware();
 
-export const store = createStore(rootReducer);
-
-// export const listenerMiddleware = createListenerMiddleware();
-
-// export const store = configureStore({
-//   reducer: {
-//     ms100: ms100Slice.reducer,
-//   },
-//   middleware: getDefaultMiddleware =>
-//     getDefaultMiddleware({
-//       serializableCheck: false,
-//     }).prepend(listenerMiddleware.middleware),
-// });
+export const store = configureStore({
+  reducer: {
+    ms100: userSlice.reducer,
+    app: appSlice.reducer,
+  },
+  middleware: getDefaultMiddleware =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }).prepend(listenerMiddleware.middleware),
+});

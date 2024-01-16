@@ -17,7 +17,7 @@ const DisplayTrack = React.forwardRef(
     hmsViewRef,
   ) => {
     // hooks
-    const hmsInstance = useSelector(state => state.user.hmsInstance);
+    const hmsInstance = useSelector(state => state.ms100.hmsInstance);
     const showStatsOnTiles = useSelector(
       state => state.app.joinConfig.showStats,
     );

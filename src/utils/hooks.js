@@ -6,7 +6,7 @@ import {
   HMSUpdateListenerActions,
 } from '@100mslive/react-native-hms';
 
-import {setRTCStats} from '../redux/actions';
+import {setRTCStats} from '../redux/reducers/appSlice';
 
 /**
  * Returns true if the screen is in portrait mode
@@ -42,7 +42,7 @@ export const useOrientation = () => {
 
 export const useRTCStatsListeners = force => {
   const dispatch = useDispatch();
-  const hmsInstance = useSelector(state => state.user.hmsInstance);
+  const hmsInstance = useSelector(state => state.ms100.hmsInstance);
   const showStatsOnTiles = useSelector(state => state.app.joinConfig.showStats);
 
   const addListeners = Boolean(showStatsOnTiles || force);

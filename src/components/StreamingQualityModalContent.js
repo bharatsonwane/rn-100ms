@@ -8,7 +8,7 @@ import {COLORS} from '../utils/theme';
 import {Menu, MenuItem} from './MenuModal';
 
 export const StreamingQualityModalContent = ({track, cancelModal}) => {
-  const hmsInstance = useSelector(state => state.user.hmsInstance);
+  const hmsInstance = useSelector(state => state.ms100.hmsInstance);
   const [remoteVideoTrack, setRemoteVideoTrack] = useState(null);
   const [showQualityOptions, setShowQualityOptions] = useState(false);
   const [originalLayer, setOriginalLayer] = useState(null);

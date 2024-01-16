@@ -42,8 +42,8 @@ import {
 import {
   changeHLSAspectRatio,
   changeShowStats,
-  saveUserData,
-} from '../../redux/actions';
+} from '../../redux/reducers/appSlice';
+import {saveUserData} from '../../redux/reducers/userSlice';
 import {parseMetadata, getInitials, getTime} from '../../utils/functions';
 import {
   ModalTypes,
@@ -396,7 +396,7 @@ export const ParticipantsModal = ({
 };
 
 const ParticipantFilter = ({filter, setFilter}) => {
-  const roles = useSelector(state => state.user.roles);
+  const roles = useSelector(state => state.ms100.roles);
 
   const [visible, setVisible] = useState(false);
 
@@ -472,7 +472,7 @@ const ParticipantFilter = ({filter, setFilter}) => {
 };
 
 export const ChangeRoleModal = ({instance, peer, cancelModal}) => {
-  const roles = useSelector(state => state.user.roles);
+  const roles = useSelector(state => state.ms100.roles);
 
   const [newRole, setNewRole] = useState(peer?.role);
   const [request, setRequest] = useState(false);
@@ -783,7 +783,7 @@ export const ChangeNameModal = ({instance, peer, cancelModal}) => {
 
 export const RtcStatsModal = () => {
   const dispatch = useDispatch();
-  const instance = useSelector(state => state.user.hmsInstance);
+  const instance = useSelector(state => state.ms100.hmsInstance);
   const showStatsOnTiles = useSelector(state => state.app.joinConfig.showStats);
 
   const [localPeer, setLocalPeer] = useState(null);
@@ -1411,7 +1411,7 @@ export const ChangeTrackStateForRoleModal = ({
   localPeer,
   cancelModal,
 }) => {
-  const roles = useSelector(state => state.user.roles);
+  const roles = useSelector(state => state.ms100.roles);
 
   const [role, setRole] = useState(localPeer?.role);
   const [visible, setVisible] = useState(false);
@@ -2068,8 +2068,8 @@ var RoleSelection;
 })(RoleSelection || (RoleSelection = {}));
 
 export const ChangeBulkRoleModal = ({cancelModal}) => {
-  const hmsInstance = useSelector(state => state.user.hmsInstance);
-  const roles = useSelector(state => state.user.roles);
+  const hmsInstance = useSelector(state => state.ms100.hmsInstance);
+  const roles = useSelector(state => state.ms100.roles);
   const [showRolesSelectionView, setShowRolesSelectionView] = useState(null);
   const [targetRole, setTargetRole] = useState(null);
   const [rolesToChange, setRolesToChange] = useState([]);
