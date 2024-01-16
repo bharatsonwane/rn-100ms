@@ -10,33 +10,22 @@ const initialState = {
     mirrorCamera: true,
   },
 
+  // user
   userName: '',
-  roomLink: getMeetingUrl(),
+  roomID: getMeetingUrl(),
   roomCode: getMeetingCode(),
-  hmsLocalPeer: null,
-  hmsInstance: null,
+  isHLSFlow: true,
+  roles: [],
+  hmsSessionStore: null,
+  spotlightTrackId: null,
 };
 
 const ms100Slice = createSlice({
   name: 'ms100Slice',
   initialState: initialState,
   reducers: {
-    // // appReducer
-    // resetJoinConfig: (state, action) => {
-    //   state.joinConfig = initialState.joinConfig;
-    // },
-    // changeJoinAudioMuted: (state, action) => {
-    //   state.joinConfig.mutedAudio = action.payload;
-    // },
-    // changeJoinVideoMuted: (state, action) => {
-    //   state.joinConfig.mutedVideo = action.payload;
-    // },
-    // changeMirrorCamera: (state, action) => {
-    //   state.joinConfig.mirrorCamera = action.payload;
-    // },
-
     // userReducer
-    saveUserDataAction: (state, action) => {
+    saveUserData: (state, action) => {
       //   const {userName, roomLink, roomCode, hmsInstance, hmsLocalPeer} =
       //     action.payload;
 
@@ -45,8 +34,24 @@ const ms100Slice = createSlice({
       });
     },
 
-    clearHmsReferenceAction: (state, action) => {
-      state.hmsInstance = null;
+    clearHmsReference: (state, action) => {
+      state.hmsInstance = undefined;
+      state.hmsSessionStore = null;
+      state.spotlightTrackId = null;
+    },
+
+    // message
+    addPinnedMessage: (state, action) => {
+      const pinnedMessage = action.payload;
+      state.pinnedMessage = pinnedMessage;
+    },
+
+    addMessage: (state, action) => {
+      const message = action.payload;
+      state.messages = [...state.messages, message];
+    },
+    clearMessageData: (state, action) => {
+      state.message = [];
     },
   },
 
@@ -54,13 +59,12 @@ const ms100Slice = createSlice({
 });
 
 export const {
-  resetJoinConfig,
-  changeJoinAudioMuted,
-  changeJoinVideoMuted,
-  changeMirrorCamera,
+  saveUserData,
+  clearHmsReference,
 
-  saveUserDataAction,
-  clearHmsReferenceAction,
+  addPinnedMessage,
+  addMessage,
+  clearMessageData,
 } = ms100Slice.actions;
 
 export default ms100Slice;
