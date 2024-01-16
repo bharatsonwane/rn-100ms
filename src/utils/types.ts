@@ -1,4 +1,4 @@
-import type {HMSPeer, HMSVideoTrack} from '@100mslive/react-native-hms';
+import type { HMSPeer, HMSVideoTrack } from '@100mslive/react-native-hms';
 
 export type PeerTrackNode = {
   id: string;
@@ -82,9 +82,9 @@ export enum Constants {
 }
 
 export const SUPPORTED_ASPECT_RATIOS = [
-  {value: 16 / 9, id: '16:9'},
-  {value: 9 / 16, id: '9:16'},
-  {value: 1, id: '1:1'},
-  {value: 4 / 3, id: '4:3'},
-  {value: 3 / 4, id: '3:4'},
+  { value: 16 / 9, id: '16:9' },
+  { value: 9 / 16, id: '9:16' },
+  { value: 1, id: '1:1' },
+  { value: 4 / 3, id: '4:3' },
+  { value: 3 / 4, id: '3:4' },
 ];

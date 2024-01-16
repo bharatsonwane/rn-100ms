@@ -1,10 +1,9 @@
 // import ms100Slice from './reducers/ms100Slice';
-import { createStore } from "redux"
+import {createStore} from 'redux';
 
-import rootReducer from "./reducers/index"
+import rootReducer from './reducers/index';
 
-export const store = createStore(rootReducer)
-
+export const store = createStore(rootReducer);
 
 // export const listenerMiddleware = createListenerMiddleware();
 

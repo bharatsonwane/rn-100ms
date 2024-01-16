@@ -1,6 +1,6 @@
-import ActionTypes from "../actionTypes"
-import { SUPPORTED_ASPECT_RATIOS } from "../../utils/types"
-import { PipModes } from "../../utils/types"
+import ActionTypes from '../actionTypes';
+import {SUPPORTED_ASPECT_RATIOS} from '../../utils/types';
+import {PipModes} from '../../utils/types';
 
 const INITIAL_STATE = {
   peerState: [],
@@ -20,139 +20,139 @@ const INITIAL_STATE = {
     showStats: false,
     showHLSStats: false,
     enableHLSPlayerControls: true,
-    showCustomHLSPlayerControls: false
-  }
-}
+    showCustomHLSPlayerControls: false,
+  },
+};
 
 const appReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case ActionTypes.CHANGE_PIP_MODE_STATUS:
-      return { ...state, pipModeStatus: action.payload.pipModeStatus }
+      return {...state, pipModeStatus: action.payload.pipModeStatus};
     case ActionTypes.SET_PEER_STATE:
-      return { ...state, ...action.payload }
+      return {...state, ...action.payload};
     case ActionTypes.CLEAR_PEER_DATA.REQUEST:
-      return { ...state, peerState: [] }
+      return {...state, peerState: []};
     case ActionTypes.CHANGE_HLS_ASPECT_RATIO:
-      return { ...state, hlsAspectRatio: action.payload.hlsAspectRatio }
+      return {...state, hlsAspectRatio: action.payload.hlsAspectRatio};
     case ActionTypes.RESET_JOIN_CONFIG:
-      return { ...state, joinConfig: INITIAL_STATE.joinConfig }
+      return {...state, joinConfig: INITIAL_STATE.joinConfig};
     case ActionTypes.CHANGE_JOIN_AUDIO_MUTED:
       return {
         ...state,
         joinConfig: {
           ...state.joinConfig,
-          mutedAudio: action.payload.mutedAudio ?? true
-        }
-      }
+          mutedAudio: action.payload.mutedAudio ?? true,
+        },
+      };
     case ActionTypes.CHANGE_JOIN_VIDEO_MUTED:
       return {
         ...state,
         joinConfig: {
           ...state.joinConfig,
-          mutedVideo: action.payload.mutedVideo ?? true
-        }
-      }
+          mutedVideo: action.payload.mutedVideo ?? true,
+        },
+      };
     case ActionTypes.CHANGE_MIRROR_CAMERA:
       return {
         ...state,
         joinConfig: {
           ...state.joinConfig,
-          mirrorCamera: action.payload.mirrorCamera ?? true
-        }
-      }
+          mirrorCamera: action.payload.mirrorCamera ?? true,
+        },
+      };
     case ActionTypes.CHANGE_JOIN_SKIP_PREVIEW:
       return {
         ...state,
         joinConfig: {
           ...state.joinConfig,
-          skipPreview: action.payload.skipPreview ?? false
-        }
-      }
+          skipPreview: action.payload.skipPreview ?? false,
+        },
+      };
     case ActionTypes.CHANGE_AUDIO_MIXER:
       return {
         ...state,
         joinConfig: {
           ...state.joinConfig,
-          audioMixer: action.payload.audioMixer ?? false
-        }
-      }
+          audioMixer: action.payload.audioMixer ?? false,
+        },
+      };
     case ActionTypes.CHANGE_MUSIC_MODE:
       return {
         ...state,
         joinConfig: {
           ...state.joinConfig,
-          musicMode: action.payload.musicMode ?? false
-        }
-      }
+          musicMode: action.payload.musicMode ?? false,
+        },
+      };
     case ActionTypes.CHANGE_SHOW_STATS:
       return {
         ...state,
         joinConfig: {
           ...state.joinConfig,
-          showStats: action.payload.showStats ?? false
-        }
-      }
+          showStats: action.payload.showStats ?? false,
+        },
+      };
     case ActionTypes.CHANGE_SHOW_HLS_STATS:
       return {
         ...state,
         joinConfig: {
           ...state.joinConfig,
-          showHLSStats: action.payload.showHLSStats ?? false
-        }
-      }
+          showHLSStats: action.payload.showHLSStats ?? false,
+        },
+      };
     case ActionTypes.CHANGE_ENABLE_HLS_PLAYER_CONTROLS:
       return {
         ...state,
         joinConfig: {
           ...state.joinConfig,
           enableHLSPlayerControls:
-            action.payload.enableHLSPlayerControls ?? true
-        }
-      }
+            action.payload.enableHLSPlayerControls ?? true,
+        },
+      };
     case ActionTypes.CHANGE_SHOW_CUSTOM_HLS_PLAYER_CONTROLS:
       return {
         ...state,
         joinConfig: {
           ...state.joinConfig,
           showCustomHLSPlayerControls:
-            action.payload.showCustomHLSPlayerControls ?? false
-        }
-      }
+            action.payload.showCustomHLSPlayerControls ?? false,
+        },
+      };
     case ActionTypes.CHANGE_SOFTWARE_DECODER:
       return {
         ...state,
         joinConfig: {
           ...state.joinConfig,
-          softwareDecoder: action.payload.softwareDecoder ?? true
-        }
-      }
+          softwareDecoder: action.payload.softwareDecoder ?? true,
+        },
+      };
     case ActionTypes.CHANGE_AUTO_RESIZE:
       return {
         ...state,
         joinConfig: {
           ...state.joinConfig,
-          autoResize: action.payload.autoResize ?? false
-        }
-      }
+          autoResize: action.payload.autoResize ?? false,
+        },
+      };
     case ActionTypes.CHANGE_AUTO_SIMULCAST:
       return {
         ...state,
         joinConfig: {
           ...state.joinConfig,
-          autoSimulcast: action.payload.autoSimulcast ?? true
-        }
-      }
+          autoSimulcast: action.payload.autoSimulcast ?? true,
+        },
+      };
     case ActionTypes.SET_RTC_STATS:
       return {
         ...state,
         rtcStats: {
           ...state.rtcStats,
-          [action.payload.trackId]: action.payload.stats
-        }
-      }
+          [action.payload.trackId]: action.payload.stats,
+        },
+      };
     default:
-      return state
+      return state;
   }
-}
+};
 
-export default appReducer
+export default appReducer;

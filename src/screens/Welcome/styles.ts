@@ -1,6 +1,6 @@
-import {StyleSheet} from 'react-native';
+import { StyleSheet } from 'react-native';
 
-import {COLORS} from '../../utils/theme';
+import { COLORS } from '../../utils/theme';
 
 const styles = StyleSheet.create({
   contentContainerStyle: {
@@ -119,4 +119,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export {styles};
+export { styles };
