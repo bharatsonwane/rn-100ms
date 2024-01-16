@@ -1,28 +1,7 @@
-import type {
-  HMSRole,
-  HMSSDK,
-  HMSSessionStore,
-} from '@100mslive/react-native-hms';
 import {getMeetingCode, getMeetingUrl} from '../../utils/functions';
 import ActionTypes from '../actionTypes';
 
-type ActionType = {
-  payload: Object;
-  type: String;
-};
-
-type IntialStateType = {
-  userName: string;
-  roomID: string;
-  hmsInstance?: HMSSDK;
-  hmsSessionStore?: HMSSessionStore | null;
-  spotlightTrackId?: string | null;
-  roomCode: string;
-  isHLSFlow: boolean;
-  roles: HMSRole[];
-};
-
-const INITIAL_STATE: IntialStateType = {
+const INITIAL_STATE = {
   userName: '',
   roomID: getMeetingUrl(),
   roomCode: getMeetingCode(),
@@ -32,7 +11,7 @@ const INITIAL_STATE: IntialStateType = {
   spotlightTrackId: null,
 };
 
-const userReducer = (state = INITIAL_STATE, action: ActionType) => {
+const userReducer = (state = INITIAL_STATE, action) => {
   switch (action.type) {
     case ActionTypes.SAVE_USER_DATA.REQUEST:
       return {
